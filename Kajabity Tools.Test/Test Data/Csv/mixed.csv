@@ -1,0 +1,9 @@
+A,B,C
+a,b,c
+1,2,3
+"With, commas","With ""Quotes""",0.67
+"A longer entry with some new
+lines
+even
+
+a blank one.",," Ah, yes, that was an empty string"
