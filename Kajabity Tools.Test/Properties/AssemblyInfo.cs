@@ -33,7 +33,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Kajabity Tools.Test")]
-[assembly: AssemblyCopyright("Copyright 2010")]
+[assembly: AssemblyCopyright("Copyright 2009-14")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

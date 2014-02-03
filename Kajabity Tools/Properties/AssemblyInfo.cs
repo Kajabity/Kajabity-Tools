@@ -30,10 +30,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Kajabity Tools")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Williams Technologies Limited")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Kajabity Tools")]
-[assembly: AssemblyCopyright("Copyright 2009")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright 2009-14")]
+[assembly: AssemblyTrademark("Kajabity")]
 [assembly: AssemblyCulture("")]
 
 // This sets the default COM visibility of types in the assembly to invisible.
