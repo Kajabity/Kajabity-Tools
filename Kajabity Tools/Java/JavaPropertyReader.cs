@@ -301,6 +301,7 @@ namespace Kajabity.Tools.Java
 
 				case ACTION_store_property:
 					//Debug.WriteLine( keyBuilder.ToString() + "=" + valueBuilder.ToString() );
+                    // Corrected to avoid duplicate entry errors - thanks to David Tanner.
 					hashtable[ keyBuilder.ToString() ] = valueBuilder.ToString();
 					keyBuilder.Length = 0;
 					valueBuilder.Length = 0;
