@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Williams Technologies Limtied.
+ * Copyright 2009-14 Simon J. Williams.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,18 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * Kajbity is a trademark of Williams Technologies Limited.
- * 
+ *
  * http://www.kajabity.com
  */
 
-/*
- * Created by SharpDevelop.
- * User: simon
- * Date: 23/11/2009
- * Time: 22:10
- */
 using System;
 using System.Collections;
 using System.IO;

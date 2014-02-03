@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Williams Technologies Limtied.
+ * Copyright 2009-14 Simon J. Williams.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,18 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * Kajbity is a trademark of Williams Technologies Limited.
- * 
+ *
  * http://www.kajabity.com
  */
 
-/*
- * Created by SharpDevelop.
- * User: simon
- * Date: 08/11/2009
- * Time: 20:34
- */
 using System;
 using System.Collections;
 using System.IO;
@@ -309,7 +301,7 @@ namespace Kajabity.Tools.Java
 
 				case ACTION_store_property:
 					//Debug.WriteLine( keyBuilder.ToString() + "=" + valueBuilder.ToString() );
-					hashtable.Add( keyBuilder.ToString(), valueBuilder.ToString() );
+					hashtable[ keyBuilder.ToString() ] = valueBuilder.ToString();
 					keyBuilder.Length = 0;
 					valueBuilder.Length = 0;
 					escaped = false;

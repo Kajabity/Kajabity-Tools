@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Williams Technologies Limtied.
+ * Copyright 2009-14 Simon J. Williams.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,9 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * Kajbity is a trademark of Williams Technologies Limited.
- * 
+ *
  * http://www.kajabity.com
  */
 
@@ -23,7 +21,6 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Resources;
 
 #endregion
 
@@ -31,17 +28,17 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Kajabity Tools")]
-[assembly: AssemblyDescription("A collection of utility classes.")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Williams Technologies Limited")]
 [assembly: AssemblyProduct("Kajabity Tools")]
-[assembly: AssemblyCopyright("Copyright 2009-13")]
-[assembly: AssemblyTrademark("Williams Technologies Limited")]
+[assembly: AssemblyCopyright("Copyright 2009")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // This sets the default COM visibility of types in the assembly to invisible.
 // If you need to expose a type to COM, use [ComVisible(true)] on that type.
-[assembly: ComVisible(true)]
+[assembly: ComVisible(false)]
 
 // The assembly version has following format :
 //
@@ -49,5 +46,4 @@ using System.Resources;
 //
 // You can specify all the values or you can use the default the Revision and 
 // Build Numbers by using the '*' as shown below:
-[assembly: AssemblyVersion("0.1.*")]
-[assembly: NeutralResourcesLanguageAttribute("en-GB")]
+[assembly: AssemblyVersion("0.2.*")]
