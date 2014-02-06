@@ -29,6 +29,7 @@ namespace Kajabity.Tools.Java
         private const string EmptyTestFile = JavaTestDataDirectory + "empty.properties";
         private const string BlankTestFile = JavaTestDataDirectory + "blank.properties";
         private const string CommentsTestFile = JavaTestDataDirectory + "comments.properties";
+        private const string DuplicateTestFile = JavaTestDataDirectory + "duplicate.properties";
         private const string LineBreaksTestFile = JavaTestDataDirectory + "line-breaks.properties";
         private const string MixedTestFile = JavaTestDataDirectory + "mixed.properties";
         private const string SeparatorsTestFile = JavaTestDataDirectory + "separators.properties";
@@ -107,6 +108,35 @@ namespace Kajabity.Tools.Java
                 fileStream.Close();
 
                 //Assert.Equals( properties.Count, 3 );
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
+            finally
+            {
+                if (fileStream != null)
+                {
+                    fileStream.Close();
+                }
+            }
+        }
+
+        [Test]
+        public void TestDuplicates()
+        {
+            FileStream fileStream = null;
+            try
+            {
+                Console.WriteLine("Loading " + DuplicateTestFile);
+
+                fileStream = new FileStream(DuplicateTestFile, FileMode.Open);
+                JavaProperties properties = new JavaProperties();
+                properties.Load(fileStream);
+                fileStream.Close();
+
+                Assert.AreEqual( properties.Count, 1 );
+                Assert.IsTrue( "c".Equals(properties.GetProperty("a") ) );
             }
             catch (Exception ex)
             {
