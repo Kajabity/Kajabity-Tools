@@ -16,8 +16,6 @@
  * http://www.kajabity.com
  */
 
-using System;
-using System.CodeDom;
 using System.Collections;
 using System.IO;
 using System.Text;
@@ -40,16 +38,20 @@ namespace Kajabity.Tools.Csv
 
         //	All the states.
         private const int STATE_Start = 0;
-        private const int STATE_Quoted = 1;
-        private const int STATE_DoubleQuote = 2;
-        private const int STATE_EndField = 3;
-        private const int STATE_EndLine = 4;
-        private const int STATE_EndFile = 5;
+        private const int STATE_Field = 1;
+        private const int STATE_Quoted = 2;
+        private const int STATE_DoubleQuote = 3;
+        private const int STATE_SkipTrailingSpace = 4;
+        private const int STATE_EndField = 5;
+        private const int STATE_EndLine = 6;
+        private const int STATE_EndFile = 7;
 
-        //	Used in debug and error reporting.
-        private static string [] stateNames = new string[]
+        /// <summary>
+        /// Used in debug and error reporting.
+        /// </summary>
+        private static readonly string [] StateNames =
         {
-            "Start", "Quoted", "Double Quote", "End of Field", "End of Line", "End of File"
+            "Start", "Field", "Quoted", "Double Quote", "SkipTrailingSpace", "End of Field", "End of Line", "End of File"
         };
 
         //	The different types of matcher used.
@@ -58,30 +60,40 @@ namespace Kajabity.Tools.Csv
         private const int MATCH_Separator = 2;
         private const int MATCH_LineFeed = 3;
         private const int MATCH_DoubleQuote = 4;
-        private const int MATCH_Any = 5;
+        private const int MATCH_WhiteSpace = 5;
+        private const int MATCH_Any = 6;
 
         //	Actions performed when a character is matched.
         private const int ACTION_none = 0;
         private const int ACTION_SaveField = 1;
         private const int ACTION_SaveLine = 2;
         private const int ACTION_AppendToField = 3;
+        private const int ACTION_AppendLineFeedToField = 4;
 
         /// <summary>
         /// The State Machine - an array of states, each an array of transitions, and each of those 
         /// an array of integers grouped in threes - { match condition, next state, action to perform }.
         /// </summary>
-        private static int [][] states = new int[][]
+        private static readonly int [][] States =
         {
             new int[]{//STATE_Start
+                //MATCH_WhiteSpace,       STATE_Start,            ACTION_none,
+                MATCH_Separator,        STATE_EndField,         ACTION_SaveField,
+                MATCH_DoubleQuote,      STATE_Quoted,           ACTION_none,
+                MATCH_LineFeed,         STATE_EndLine,          ACTION_SaveLine,
+                MATCH_EOF,              STATE_EndFile,          ACTION_SaveLine,
+                MATCH_Any,              STATE_Field,            ACTION_AppendToField,
+            },
+            new int[]{//STATE_Field
                 MATCH_Separator,        STATE_EndField,         ACTION_SaveField,
                 MATCH_LineFeed,         STATE_EndLine,          ACTION_SaveLine,
-                MATCH_DoubleQuote,      STATE_Quoted,           ACTION_none,
                 MATCH_EOF,              STATE_EndFile,          ACTION_SaveLine,
-                MATCH_Any,              STATE_Start,            ACTION_AppendToField,
+                MATCH_Any,              STATE_Field,            ACTION_AppendToField,
             },
             new int[]{//STATE_Quoted
                 MATCH_DoubleQuote,      STATE_DoubleQuote,      ACTION_none,
                 MATCH_EOF,              STATE_EndFile,          ACTION_SaveLine,
+                MATCH_LineFeed,         STATE_Quoted,           ACTION_AppendLineFeedToField,
                 MATCH_Any,              STATE_Quoted,           ACTION_AppendToField,
             },
             new int[]{//STATE_DoubleQuote
@@ -89,6 +101,13 @@ namespace Kajabity.Tools.Csv
                 MATCH_EOF,              STATE_EndFile,          ACTION_SaveLine,
                 MATCH_Separator,        STATE_EndField,         ACTION_SaveField,
                 MATCH_LineFeed,         STATE_EndLine,          ACTION_SaveLine,
+                //MATCH_WhiteSpace,       STATE_SkipTrailingSpace,ACTION_none,
+            },
+            new int[]{//STATE_SkipTrailingSpace
+                MATCH_EOF,              STATE_EndFile,          ACTION_SaveLine,
+                MATCH_Separator,        STATE_EndField,         ACTION_SaveField,
+                MATCH_LineFeed,         STATE_EndLine,          ACTION_SaveLine,
+                MATCH_WhiteSpace,       STATE_SkipTrailingSpace,ACTION_none,
             },
             new int[]{//STATE_EndField
                 MATCH_none,             STATE_Start,            ACTION_none,
@@ -96,6 +115,7 @@ namespace Kajabity.Tools.Csv
             new int[]{//STATE_EndLine
                 MATCH_none,             STATE_Start,            ACTION_none,
             },
+            //STATE_EndFile - no state transitions.
         };
 
         #endregion
@@ -104,8 +124,10 @@ namespace Kajabity.Tools.Csv
         //  Constants
         //	---------------------------------------------------------------------
 
-        //	The size of the buffer used to read the input data.
-        private const int bufferSize =  1000;
+        /// <summary>
+        /// The size of the buffer used to read the input data.
+        /// </summary>	
+        private const int BufferSize =  1000;
 
         //	---------------------------------------------------------------------
         //  The result.
@@ -134,21 +156,26 @@ namespace Kajabity.Tools.Csv
         /// </summary>
         private int state = STATE_Start;
 
-        private BufferedStream reader = null;
+        private BufferedStream inStream = null;
         private int savedChar;
         private bool saved = false;
+
+        /// <summary>
+        /// A variable to hold on to the 2nd LineFeed character - if there is one.
+        /// </summary>
+        private int ExtraLinefeedChar = 0;
 
         //  ---------------------------------------------------------------------
         //  Constructors.
         //  ---------------------------------------------------------------------
 
         /// <summary>
-        /// Construct a reader.
+        /// Construct a inStream.
         /// </summary>
         /// <param name="stream">The input stream to read from.</param>
         public CsvReader( Stream stream )
         {
-            reader = new BufferedStream( stream, bufferSize );
+            inStream = new BufferedStream( stream, BufferSize );
         }
 
         /// <summary>
@@ -165,7 +192,7 @@ namespace Kajabity.Tools.Csv
             }
 
             // Parse the next field.
-            parse( STATE_EndField );
+            Parse( STATE_EndField );
 
             // Return and remove the last field.
             string field = (string) fieldList[ fieldList.Count - 1 ];
@@ -186,8 +213,8 @@ namespace Kajabity.Tools.Csv
                 return null;
             }
 
-            // Parse the next field.
-            parse( STATE_EndLine );
+            // Parse to the end of the current line.
+            Parse( STATE_EndLine );
 
             // Return and remove the last field.
             string [] record = (string []) rowList[ rowList.Count - 1 ];
@@ -196,9 +223,10 @@ namespace Kajabity.Tools.Csv
         }
 
         /// <summary>
-        /// Reads all fields and records from the CSV input stream.
+        /// Reads all fields and records from the CSV input stream from the current location.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>an array of string arrays, each row representing a row of values from the CSV file - or null if
+        /// already at the end of the file.</returns>
         public string [][] ReadAll()
         {
             // Check we haven't passed the end of the file.
@@ -207,8 +235,8 @@ namespace Kajabity.Tools.Csv
                 return null;
             }
 
-            // Parse the next field.
-            parse( STATE_EndFile );
+            // Parse to the end of the file.
+            Parse( STATE_EndFile );
 
             // Return and remove the last field.
             string [][] records = (string [][]) rowList.ToArray( typeof (string []) );
@@ -224,7 +252,7 @@ namespace Kajabity.Tools.Csv
         /// by indicating which state to finish on.</param>
         /// <exception cref="T:CsvParseException">Thrown when an unexpected/invalid character 
         /// is encountered in the input stream.</exception>
-        private void parse( int finalSate )
+        private void Parse( int finalSate )
         {
             if( finalSate >= STATE_EndFile )
             {
@@ -243,44 +271,46 @@ namespace Kajabity.Tools.Csv
                 }
                 else
                 {
-                    ch = nextChar();
+                    ch = NextChar();
                 }
 
-                for( int s = 0; s < states[ state ].Length; s += 3 )
+                for( int s = 0; s < States[ state ].Length; s += 3 )
                 {
-                    if( matches( states[ state ][ s ], ch ) )
+                    if( Matches( States[ state ][ s ], ch ) )
                     {
                         //Debug.WriteLine( stateNames[ state ] + ", " + (s/3) + ", " + ch + (ch>20?" (" + (char) ch + ")" : "") );
                         matched = true;
 
-                        if( states[ state ][ s ] == MATCH_none )
+                        if( States[ state ][ s ] == MATCH_none )
                         {
                             lambda = true;
                         }
 
-                        doAction( states[ state ][ s + 2 ], ch );
+                        DoAction( States[ state ][ s + 2 ], ch );
 
-                        state = states[ state ][ s + 1 ];
+                        state = States[ state ][ s + 1 ];
                         break;
                     }
                 }
 
                 if( !matched )
                 {
-                    throw new CsvParseException( "Unexpected character at " + 1 + ": <<<" + ch + ">>>" );
+                    throw new CsvParseException( "Unexpected character at state " + StateNames[ state ] + ": <<<" + (char) ch + ">>>" );
                 }
             }
             while( state < finalSate );
         }
 
         /// <summary>
-        ///
+        /// Tests if the current character matches a test (one of the MATCH_* tests).
         /// </summary>
-        /// <param name="match"></param>
-        /// <param name="ch"></param>
+        /// <param name="match">The number of the MATCH_* test to try.</param>
+        /// <param name="ch">The character to test.</param>
         /// <returns></returns>
-        private bool matches( int match, int ch )
+        private bool Matches( int match, int ch )
         {
+            ExtraLinefeedChar = 0;
+
             switch( match )
             {
             case MATCH_none:
@@ -295,13 +325,14 @@ namespace Kajabity.Tools.Csv
             case MATCH_LineFeed:
                 if( ch == '\r' )
                 {
-                    if( peekChar() == '\n')
+                    if( PeekChar() == '\n')
                     {
+                        ExtraLinefeedChar = '\n';
                         saved = false;
                     }
                     return true;
                 }
-                else if( ch == '\n' )
+                if( ch == '\n' )
                 {
                     return true;
                 }
@@ -309,6 +340,9 @@ namespace Kajabity.Tools.Csv
 
             case MATCH_DoubleQuote:
                 return ch == '"';
+
+            case MATCH_WhiteSpace:
+                return ch == ' ' || ch == '\t' || ch == '\v';
 
             case MATCH_Any:
                 return true;
@@ -319,7 +353,7 @@ namespace Kajabity.Tools.Csv
             }
         }
 
-        private void doAction( int action, int ch )
+        private void DoAction( int action, int ch )
         {
             switch( action )
             {
@@ -346,12 +380,13 @@ namespace Kajabity.Tools.Csv
                 fieldBuilder.Append( (char) ch );
                 break;
 
-            default:
+            case ACTION_AppendLineFeedToField:
+                fieldBuilder.Append( (char) ch ).Append( (char) ExtraLinefeedChar );
                 break;
             }
         }
 
-        private int nextChar()
+        private int NextChar()
         {
             if( saved )
             {
@@ -359,10 +394,10 @@ namespace Kajabity.Tools.Csv
                 return savedChar;
             }
 
-            return reader.ReadByte();
+            return inStream.ReadByte();
         }
 
-        private int peekChar()
+        private int PeekChar()
         {
             if( saved )
             {
@@ -370,7 +405,7 @@ namespace Kajabity.Tools.Csv
             }
 
             saved = true;
-            return savedChar = reader.ReadByte();
+            return savedChar = inStream.ReadByte();
         }
     }
 }

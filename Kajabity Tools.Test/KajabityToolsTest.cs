@@ -102,6 +102,7 @@ namespace Kajabity.Tools.Test
         /// <param name="content"></param>
         public void CreateTestFile(string name, string content)
         {
+            //TODO: write CreateTestFile
         }
 
         /// <summary>
@@ -111,7 +112,37 @@ namespace Kajabity.Tools.Test
         /// <param name="content"></param>
         public void CheckFileContent(string name, string content)
         {
-
+            //TODO write CheckFileContent
         }
+
+        /// <summary>
+        /// Returns true if two string arrays contain the same values.
+        /// </summary>
+        /// <param name="a">first string array to compare</param>
+        /// <param name="b">second string array to compare</param>
+        /// <returns></returns>
+        public bool CompareStringArray(string[] a, string[] b)
+        {
+            if (a == null)
+            {
+                return b == null;
+            }
+
+            if (b == null || a.Length != b.Length)
+            {
+                return false;
+            }
+
+            for(int i = 0; i < a.Length; i++)
+            {
+                if (!a[i].Equals(b[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
     }
 }

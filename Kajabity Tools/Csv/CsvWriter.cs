@@ -16,10 +16,7 @@
  * http://www.kajabity.com
  */
 
-using System;
 using System.IO;
-using System.Collections;
-using System.Text;
 
 namespace Kajabity.Tools.Csv
 {
@@ -151,34 +148,6 @@ namespace Kajabity.Tools.Csv
 				{
 					WriteField( field );
 				}
-				
-
-				if( --flush == 0 )
-				{
-					writer.Flush();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Appends a record to the output stream - assumes this is not the
-		/// first record so a new line is added first.
-		/// </summary>
-		/// <param name="record">The record to be appended - an array of string fields.</param>
-		public void AppendRecord( string [] record )
-		{
-			flush++;
-			if( record != null && record.Length > 0 )
-			{
-				recordCount++;
-				writer.Write( newLine );
-				fieldCount = 0;
-
-				foreach( string field in record )
-				{
-					WriteField( field );
-				}
-				
 
 				if( --flush == 0 )
 				{
@@ -200,26 +169,8 @@ namespace Kajabity.Tools.Csv
 				writer.Write( Separator );
 			}
 
-			writeFieldEscaped( field );
+			WriteFieldEscaped( field );
 			
-
-			if( --flush == 0 )
-			{
-				writer.Flush();
-			}
-		}
-
-		/// <summary>
-		/// Append a single field to the output stream assuming it is not the first
-		/// in the record - i.e. appends the separator first.
-		/// </summary>
-		/// <param name="field">a field to be written</param>
-		public void AppendField( string field )
-		{
-			flush++;
-			fieldCount++;
-			writer.Write( Separator );
-			writeFieldEscaped( field );
 
 			if( --flush == 0 )
 			{
@@ -237,9 +188,9 @@ namespace Kajabity.Tools.Csv
 		/// is written (not even quoted).
 		/// </summary>
 		/// <param name="field">a field to be written</param>
-		private void writeFieldEscaped( string field )
+		private void WriteFieldEscaped( string field )
 		{
-			if( field == null || field.Length == 0 )
+			if( string.IsNullOrEmpty(field) )
 			{
 				return;
 			}

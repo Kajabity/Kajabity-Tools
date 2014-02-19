@@ -16,12 +16,10 @@
  * http://www.kajabity.com
  */
 
+using Kajabity.Tools.Test;
+using NUnit.Framework;
 using System;
 using System.IO;
-
-using NUnit.Framework;
-
-using Kajabity.Tools.Test;
 
 namespace Kajabity.Tools.Csv
 {
@@ -74,16 +72,16 @@ namespace Kajabity.Tools.Csv
 		}
 		
 		[Test]
-		public void TestAppendRecord()
+		public void TestWriteRecord()
 		{
-            string filename = CsvOutputDirectory + "test-append-record.csv";
+            string filename = CsvOutputDirectory + "test-write-record.csv";
 			string [] record = new string[] { "AAAA", "BBBB", "CCCC" };
-			const int lenRecord = 16; // Strings, commas, preceding CR/LF.
+			const int lenRecord = 14; // Strings, commas.
 
             Stream stream = null;
 			try
 			{
-				//	Create the temp file
+				//	Create the temp file (or overwrite if already there).
 				stream = File.Open( filename, FileMode.OpenOrCreate, FileAccess.ReadWrite );
 				stream.SetLength( 0 );
 				stream.Close();
@@ -97,7 +95,7 @@ namespace Kajabity.Tools.Csv
 				
 				//	Append a record.
 				CsvWriter writer = new CsvWriter( stream );
-				writer.AppendRecord( record );
+				writer.WriteRecord( record );
 				stream.Flush();
 				stream.Close();
 
@@ -114,7 +112,7 @@ namespace Kajabity.Tools.Csv
 				if( stream != null )
 				{
 					stream.Close();
-					//File.Delete( filename );
+					//File.Delete( filename );  // Keep it for debugging.
 				}
 			}
 		}

@@ -224,6 +224,7 @@ namespace Kajabity.Tools.Java
 		public void Parse( Stream stream )
 		{
 			reader = new BufferedStream( stream, bufferSize );
+            //TODO: Read using correct encoding ISO-8859-1 encoding (code page 28592).
 
 			int state = STATE_start;
 			do
