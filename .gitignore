@@ -1,3 +1,13 @@
+## Ignore eclipse project files
+.settings/
+.classpath
+.project
+target/
+website/
+*.url
+.DotSettings
+
+
 ## Ignore subversion directories.
 .svn/
 

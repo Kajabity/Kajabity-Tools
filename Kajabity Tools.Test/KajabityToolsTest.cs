@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2009-14 Simon J. Williams.
+ * Copyright 2009-15 Williams Technologies Limtied.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * Kajbity is a trademark of Williams Technologies Limited.
+ *
  * http://www.kajabity.com
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
+using System.IO;
+using System.Text;
 
 namespace Kajabity.Tools.Test
 {

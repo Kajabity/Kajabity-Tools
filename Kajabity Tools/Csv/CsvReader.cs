@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-14 Simon J. Williams.
+ * Copyright 2009-15 Williams Technologies Limtied.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Kajbity is a trademark of Williams Technologies Limited.
  *
  * http://www.kajabity.com
  */
@@ -33,8 +35,8 @@ namespace Kajabity.Tools.Csv
     public class CsvReader
     {
         //	---------------------------------------------------------------------
-		#region The State Machine (ATNP)        
-		//	---------------------------------------------------------------------
+        #region The State Machine (ATNP)        
+        //	---------------------------------------------------------------------
 
         //	All the states.
         private const int STATE_Start = 0;
@@ -55,7 +57,7 @@ namespace Kajabity.Tools.Csv
         };
 
         //	The different types of matcher used.
-    	private const int MATCH_none = 0;
+        private const int MATCH_none = 0;
         private const int MATCH_EOF = 1;
         private const int MATCH_Separator = 2;
         private const int MATCH_LineFeed = 3;
@@ -156,8 +158,19 @@ namespace Kajabity.Tools.Csv
         /// </summary>
         private int state = STATE_Start;
 
+        /// <summary>
+        /// The input stream that characters are read and parsed from.
+        /// </summary>
         private BufferedStream inStream = null;
+
+        /// <summary>
+        /// Stores the next character after it's been peeked until it is removed by NextChar().
+        /// </summary>
         private int savedChar;
+
+        /// <summary>
+        /// A flag to indicate whether or not there is a savedChar.
+        /// </summary>
         private bool saved = false;
 
         /// <summary>
@@ -353,6 +366,11 @@ namespace Kajabity.Tools.Csv
             }
         }
 
+        /// <summary>
+        /// Performs the action associated with a state transition.
+        /// </summary>
+        /// <param name="action">The number of the action to perform.</param>
+        /// <param name="ch">The character matched in the state.</param>
         private void DoAction( int action, int ch )
         {
             switch( action )
@@ -386,6 +404,10 @@ namespace Kajabity.Tools.Csv
             }
         }
 
+        /// <summary>
+        /// Returns and removes the next character from the input stream - including any that have been peeked and pushed back.
+        /// </summary>
+        /// <returns>The next character from the stream.</returns>
         private int NextChar()
         {
             if( saved )
@@ -397,6 +419,11 @@ namespace Kajabity.Tools.Csv
             return inStream.ReadByte();
         }
 
+        /// <summary>
+        /// Retuns but doesn't remove the next character from the stream.  
+        /// This character will be returned every time this method is called until it is returned by NextChar().
+        /// </summary>
+        /// <returns>The next character from the stream.</returns>
         private int PeekChar()
         {
             if( saved )
