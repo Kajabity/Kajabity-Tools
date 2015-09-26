@@ -31,12 +31,6 @@ namespace Kajabity.Tools.Csv
 		//  ---------------------------------------------------------------------
 		//  Settings
 		//  ---------------------------------------------------------------------
-
-		/// <summary>
-		/// Any string containing the following characters needs to be quoted and
-		/// any quote characters doubled up.
-		/// </summary>
-		private static char[] escapeChars = new char[] { '\n', '\r', '"', ',' };
 		
 		/// <summary>
 		/// An explicit newline string matching the standard.
@@ -48,10 +42,30 @@ namespace Kajabity.Tools.Csv
 		//  ---------------------------------------------------------------------
 
 		/// <summary>
+		/// Any string containing the following characters needs to be quoted and
+		/// any quote characters doubled up.
+		/// </summary>
+        private char[] escapeChars = new char[] { ',', '"', '\n', '\r' };
+
+		/// <summary>
 		/// Gets or sets the separator character used in the file - default
 		/// value is a comma (",").
 		/// </summary>
-		public char Separator = ',';
+		private char separator = ',';
+        public char Separator
+        {
+            get
+            {
+                return separator;
+            }
+            set
+            {
+                separator = value;
+
+                // Now update escapeChars so the changed separator will be escaped.
+                escapeChars[ 0 ] = separator;
+            }
+        }
 
 		/// <summary>
 		/// The class checks each field to see if it needs to be quoted - unless
@@ -168,7 +182,7 @@ namespace Kajabity.Tools.Csv
 			flush++;
 			if( fieldCount++ > 0 )
 			{
-				writer.Write( Separator );
+				writer.Write( separator );
 			}
 
 			WriteFieldEscaped( field );

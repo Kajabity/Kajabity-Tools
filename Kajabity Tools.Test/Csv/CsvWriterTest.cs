@@ -118,7 +118,67 @@ namespace Kajabity.Tools.Csv
 				}
 			}
 		}
-		
 
-	}
+        [Test]
+        public void TestWriteAlternateSeparator()
+        {
+            string filename = CsvOutputDirectory + "test-write-alternate-separator.csv";
+            string[] record = new string[] { "AA,AA original separator", "BB|BB new separator", "CCCC" };
+            const int lenRecord = 14; // Strings, commas.
+
+            Stream stream = null;
+            try
+            {
+                Console.WriteLine( "Creating empty " + filename );
+                //	Create the temp file (or overwrite if already there).
+                stream = File.Open( filename, FileMode.OpenOrCreate, FileAccess.ReadWrite );
+                stream.SetLength( 0 );
+                stream.Close();
+
+                //	Check it's empty.
+                FileInfo info = new FileInfo( filename );
+                Assert.AreEqual( 0, info.Length, "File length not zero." );
+
+                //  Open for append
+                Console.WriteLine( "Writing " + filename );
+                stream = File.OpenWrite( filename );
+
+                //	Append a record.
+                CsvWriter writer = new CsvWriter( stream );
+                writer.Separator = '|';
+                writer.WriteRecord( record );
+                stream.Flush();
+                stream.Close();
+
+                Console.WriteLine( "Loading " + filename );
+                stream = File.OpenRead( filename );
+                CsvReader reader = new CsvReader( stream );
+                reader.Separator = '|';
+                string[][] records = reader.ReadAll();
+
+                Assert.AreEqual( 1, records.Length, "Should only be one record." );
+
+                Console.WriteLine( "REad :" + ToString( records[ 0 ] ) );
+
+                Assert.AreEqual( record.Length, records[0].Length, "Should be " + record.Length + " fields in record." );
+
+                for( int fieldNo = 0; fieldNo < record.Length; fieldNo++ )
+                {
+                    Assert.AreEqual( record[ fieldNo ], records[ 0 ][ fieldNo ], "Field " + record.Length + " Should be " + record[ fieldNo ] );
+                }
+            }
+            catch( Exception ex )
+            {
+                Assert.Fail( ex.Message );
+            }
+            finally
+            {
+                if( stream != null )
+                {
+                    stream.Close();
+                    //File.Delete( filename );  // Keep it for debugging.
+                }
+            }
+        }
+    }
 }
