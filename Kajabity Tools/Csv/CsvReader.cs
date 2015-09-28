@@ -191,6 +191,10 @@ namespace Kajabity.Tools.Csv
             inStream = new BufferedStream( stream, BufferSize );
         }
 
+        //  ---------------------------------------------------------------------
+        //  Methods.
+        //  ---------------------------------------------------------------------
+
         /// <summary>
         /// Reads the next field on the current line - or null after the end of the line.  The
         /// field will not be part of the next ReadLine or ReadFile.

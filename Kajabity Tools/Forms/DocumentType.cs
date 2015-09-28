@@ -22,16 +22,25 @@ using System;
 
 namespace Kajabity.Tools.Forms
 {
-	/// <summary>
-	/// Description of DocumentType.
-	/// </summary>
-	public class DocumentType
-	{
-		public string Name;
-		public string Pattern;
-		
-		public DocumentType()
-		{
-		}
-	}
+    /// <summary>
+    /// Encapsulates the name of a type of document and it's default extension.
+    /// </summary>
+    public class DocumentType
+    {
+        public string Name;
+        public string Pattern;
+
+        //  ---------------------------------------------------------------------
+        //  Constructors.
+        //  ---------------------------------------------------------------------
+
+        public DocumentType()
+        {
+        }
+
+        //  ---------------------------------------------------------------------
+        //  Methods.
+        //  ---------------------------------------------------------------------
+
+    }
 }

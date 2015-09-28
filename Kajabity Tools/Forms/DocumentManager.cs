@@ -23,130 +23,170 @@ using System.IO;
 
 namespace Kajabity.Tools.Forms
 {
-	/// <summary>
-	/// Description of DocumentManager.
-	/// </summary>
-	public abstract class DocumentManager
-	{
-		private string defaultExtension = "txt";
-		public string DefaultExtension
-		{
-			get
-			{
-				return defaultExtension;
-			}
-			set
-			{
-				defaultExtension = value;
-			}
-		}
-		
-		private string defaultName = "Document";
-		public string DefaultName
-		{
-			get
-			{
-				return defaultName;
-			}
-			set
-			{
-				defaultName = value;
-			}
-		}
-		
-		//	The filename of the current document.
-		private string filename = null;
-		public string Filename
-		{
-			get
-			{
-				return filename;
-			}
-		}
+    /// <summary>
+    /// A base class to manage the lifecycle of a Document by creating new, empty documents, 
+    /// Opening existing documents, tracking the modification state of documents and Saving
+    /// documents.
+    /// 
+    /// Extend this class to implement methods to handle specific document types.
+    /// </summary>
+    public abstract class DocumentManager
+    {
+        private string defaultExtension = "txt";
 
-		//	An indication of whether there is a filename applied.
-		private bool newfile = true;
-		public bool NewFile
-		{
-			get
-			{
-				return newfile;
-			}
-		}
-		
-		private int docCount = 0;
-		
-		protected Document document = null;
-		public Document Document
-		{
-			get
-			{
-				return document;
-			}
-		}
-		
-		public bool Opened
-		{
-			get
-			{
-				return document != null;
-			}
-		}
-		
-		public bool Modified
-		{
-			get
-			{
-				return Opened ? document.Modified : false;
-			}
-		}
+        /// <summary>
+        /// The filename extension (without the dot) for the type of files managed by this class.
+        /// </summary>
+        public string DefaultExtension
+        {
+            get
+            {
+                return defaultExtension;
+            }
+            set
+            {
+                defaultExtension = value;
+            }
+        }
+        
+        private string defaultName = "Document";
 
-		public DocumentManager()
-		{
-		}
+        /// <summary>
+        /// The default name or filename (without path or extension) for a file created by this class.
+        /// </summary>
+        public string DefaultName
+        {
+            get
+            {
+                return defaultName;
+            }
+            set
+            {
+                defaultName = value;
+            }
+        }
+        
+        private string filename = null;
 
-		public virtual void NewDocument()
-		{
-			string documentName = String.Format( defaultName + "." + defaultExtension, ++docCount );
-			filename = documentName;
-			newfile = true;
+        /// <summary>
+        /// The filename of the current document.
+        /// </summary>
+        public string Filename
+        {
+            get
+            {
+                return filename;
+            }
+        }
 
-			if( document != null )
-			{
-				document.Name = documentName;
-			}
-		}
+        private bool newfile = true;
 
-		public virtual void Load( string filename )
-		{
-			this.filename = filename;
-			newfile = false;
+        /// <summary>
+        ///	An indication of whether there is a filename applied.
+        /// </summary>
+        public bool NewFile
+        {
+            get
+            {
+                return newfile;
+            }
+        }
+        
+        /// <summary>
+        /// Counts the number of documents openned by this instance of the Document Manager to 
+        /// allow default filenames to be more unique.
+        /// </summary>
+        private int docCount = 0;
+        
+        protected Document document = null;
 
-			if( document != null )
-			{
-				FileInfo fileInfo = new FileInfo(filename);
-				document.Name = fileInfo.Name;
-				document.Modified = false;
-			}
-		}
+        /// <summary>
+        /// Get the currently loaded document - or null if no document loaded.
+        /// </summary>
+        public Document Document
+        {
+            get
+            {
+                return document;
+            }
+        }
+        
+        /// <summary>
+        /// Returns true this instance has a document.
+        /// </summary>
+        public bool Opened
+        {
+            get
+            {
+                return document != null;
+            }
+        }
+        
+        /// <summary>
+        /// Tests if a document is Opened and is modified.
+        /// </summary>
+        public bool Modified
+        {
+            get
+            {
+                return Opened && document.Modified;
+            }
+        }
 
-		public virtual void Save( string filename )
-		{
-			this.filename = filename;
-			newfile = false;
+        //  ---------------------------------------------------------------------
+        //  Constructors.
+        //  ---------------------------------------------------------------------
 
-			if( document != null )
-			{
-				FileInfo fileInfo = new FileInfo(filename);
-				document.Name = fileInfo.Name;
-				document.Modified = false;
-			}
-		}
+        public DocumentManager()
+        {
+        }
 
-		public virtual void Close()
-		{
-			document = null;
-			newfile = false;
-		}
-	}
+        //  ---------------------------------------------------------------------
+        //  Methods.
+        //  ---------------------------------------------------------------------
+
+        public virtual void NewDocument()
+        {
+            string documentName = String.Format( defaultName + "." + defaultExtension, ++docCount );
+            filename = documentName;
+            newfile = true;
+
+            if( document != null )
+            {
+                document.Name = documentName;
+            }
+        }
+
+        public virtual void Load( string filename )
+        {
+            this.filename = filename;
+            newfile = false;
+
+            if( document != null )
+            {
+                FileInfo fileInfo = new FileInfo(filename);
+                document.Name = fileInfo.Name;
+                document.Modified = false;
+            }
+        }
+
+        public virtual void Save( string filename )
+        {
+            this.filename = filename;
+            newfile = false;
+
+            if( document != null )
+            {
+                FileInfo fileInfo = new FileInfo(filename);
+                document.Name = fileInfo.Name;
+                document.Modified = false;
+            }
+        }
+
+        public virtual void Close()
+        {
+            document = null;
+            newfile = false;
+        }
+    }
 }

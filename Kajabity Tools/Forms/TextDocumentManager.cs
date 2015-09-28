@@ -38,11 +38,19 @@ namespace Kajabity.Tools.Forms
 			}
 		}
 
-		public TextDocumentManager()
+        //  ---------------------------------------------------------------------
+        //  Constructors.
+        //  ---------------------------------------------------------------------
+
+        public TextDocumentManager()
 		{
 			DefaultName = "";
 			DefaultExtension = "txt";
 		}
+
+        //  ---------------------------------------------------------------------
+        //  Methods.
+        //  ---------------------------------------------------------------------
 
 		public override void NewDocument()
 		{

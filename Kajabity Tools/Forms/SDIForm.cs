@@ -18,13 +18,6 @@
  * http://www.kajabity.com
  */
 
-/*
- * Created by SharpDevelop.
- * User: simon
- * Date: 20/12/2009
- * Time: 00:23
- * 
- */
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -41,6 +34,10 @@ namespace Kajabity.Tools.Forms
 
         protected bool backup = false;
 
+        //  ---------------------------------------------------------------------
+        //  Constructors.
+        //  ---------------------------------------------------------------------
+
         public SDIForm()
         {
             this.Load += new EventHandler( SDIForm_Load );
@@ -51,6 +48,10 @@ namespace Kajabity.Tools.Forms
             this.manager = manager;
             this.Load += new EventHandler( SDIForm_Load );
         }
+
+        //  ---------------------------------------------------------------------
+        //  Methods.
+        //  ---------------------------------------------------------------------
 
         private void SDIForm_Load( object sender, System.EventArgs e )
         {
