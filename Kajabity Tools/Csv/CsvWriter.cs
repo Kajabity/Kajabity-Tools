@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,14 @@ namespace Kajabity.Tools.Csv
         private char[] escapeChars = new char[] { ',', '"', '\n', '\r' };
 
         /// <summary>
+        /// The separator between fields in a single CSV record (line).
+        /// </summary>
+        private char separator = ',';
+
+        /// <summary>
         /// Gets or sets the separator character used in the file - default
         /// value is a comma (",").
         /// </summary>
-        private char separator = ',';
         public char Separator
         {
             get
@@ -64,6 +68,30 @@ namespace Kajabity.Tools.Csv
 
                 // Now update escapeChars so the changed separator will be escaped.
                 escapeChars[ 0 ] = separator;
+            }
+        }
+
+        /// <summary>
+        /// The character used to quote a single field in a CSV record (line).
+        /// </summary>
+        private char quote = '"';
+
+        /// <summary>
+        /// Gets or sets the quote character used in the file - default
+        /// value is a double quote ('"').
+        /// </summary>
+        public char Quote
+        {
+            get
+            {
+                return quote;
+            }
+            set
+            {
+                quote = value;
+
+                // Now update escapeChars so the changed separator will be escaped.
+                escapeChars[1] = quote;
             }
         }
 
@@ -213,20 +241,21 @@ namespace Kajabity.Tools.Csv
 
             if( field.Length > QuoteLimit || field.IndexOfAny( escapeChars ) >= 0 )
             {
-                writer.Write( '"' );
+                writer.Write(quote);
                 foreach( char ch in field )
                 {
-                    writer.Write( ch );
-                    if( ch == '"' )
+                    writer.Write(ch);
+                    if( ch == quote )
                     {
-                        writer.Write( '"' );
+                        writer.Write(quote);
                     }
                 }
-                writer.Write( '"' );
+
+                writer.Write(quote);
             }
             else
             {
-                writer.Write( field );
+                writer.Write(field);
             }
         }
     }

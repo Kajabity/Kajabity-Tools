@@ -2,7 +2,7 @@
 using Kajabity.Tools.Forms;
 using System.Diagnostics;
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,14 @@ namespace CsvEditor
 
         public CsvDocumentManager()
         {
-            DefaultName = "";
+            DefaultName = "CsvDocument";
             DefaultExtension = "csv";
         }
 
         public override void NewDocument()
         {
             document = new CsvDocument();
+            ((CsvDocument)document).Rows = new string[0][];
 
             base.NewDocument();
         }

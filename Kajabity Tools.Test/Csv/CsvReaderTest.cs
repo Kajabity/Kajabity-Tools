@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ using NUnit.Framework;
 
 namespace Kajabity.Tools.Csv
 {
-	[TestFixture]
-	public class CsvReaderTest : KajabityToolsTest
-	{
+    [TestFixture]
+    public class CsvReaderTest : KajabityToolsTest
+    {
         private const string EmptyTestFile = CsvTestDataDirectory + "empty.csv";
         private const string SimpleTestFile = CsvTestDataDirectory + "simple.csv";
         private const string ThreeBlankLinesTestFile = CsvTestDataDirectory + "three-blank-lines.csv";
@@ -43,8 +43,8 @@ namespace Kajabity.Tools.Csv
         // TODO: test reading error scenarios, 
         private const string UnixLineEndsTestFile = CsvTestDataDirectory + "unix-line-ends.csv";
         private const string ErrorQuotesTestFile = CsvTestDataDirectory + "error-quotes.csv";
-		// TODO: test with alternate separator
-		// TODO: Test reading fields to end of line with zero, one or more fields.
+        // TODO: test with alternate separator
+        // TODO: Test reading fields to end of line with zero, one or more fields.
 
         [Test]
         public void TestCsvEmptyFile()
@@ -423,71 +423,71 @@ namespace Kajabity.Tools.Csv
         }
 
         [Test]
-		public void TestCsvReadAll()
-		{
-			FileStream fileStream = null;
-			try
-			{
+        public void TestCsvReadAll()
+        {
+            FileStream fileStream = null;
+            try
+            {
                 Console.WriteLine( "Loading " + MixedTestFile );
                 fileStream = File.OpenRead( MixedTestFile );
-				CsvReader reader = new CsvReader( fileStream );
+                CsvReader reader = new CsvReader( fileStream );
 
-				string [][] records = reader.ReadAll();
-				int line = 0;
+                string [][] records = reader.ReadAll();
+                int line = 0;
 
-				foreach( string[] record in records )
-				{
-					Console.WriteLine( ++line + ":" + ToString( record ) );
-				}
-			}
+                foreach( string[] record in records )
+                {
+                    Console.WriteLine( ++line + ":" + ToString( record ) );
+                }
+            }
             catch (Exception ex)
             {
                 Assert.Fail( ex.Message );
             }
             finally
-			{
-				if( fileStream != null )
-				{
-					fileStream.Close();
-				}
-			}
-		}
+            {
+                if( fileStream != null )
+                {
+                    fileStream.Close();
+                }
+            }
+        }
 
-		[Test]
+        [Test]
         public void TestCsvReadFieldAndRecord()
-		{
+        {
             Console.WriteLine("Loading " + MixedTestFile );
-			FileStream fileStream = null;
-			try
-			{
+            FileStream fileStream = null;
+            try
+            {
                 fileStream = File.OpenRead(MixedTestFile);
-				CsvReader reader = new CsvReader( fileStream );
+                CsvReader reader = new CsvReader( fileStream );
 
-				Console.WriteLine( "Line 1, Field 1: \"" + reader.ReadField() + "\"" );
+                Console.WriteLine( "Line 1, Field 1: \"" + reader.ReadField() + "\"" );
 
-				Console.WriteLine( "Rest of Line 1: \"" + ToString( reader.ReadRecord() ) + "\"" );
+                Console.WriteLine( "Rest of Line 1: \"" + ToString( reader.ReadRecord() ) + "\"" );
 
-				Console.WriteLine( "Rest of File: " );
+                Console.WriteLine( "Rest of File: " );
 
-				string [][] records = reader.ReadAll();
-				int line = 0;
-				foreach( string[] record in records )
-				{
-					Console.WriteLine( ++line + ":" + ToString( record ) );
-				}
-			}
+                string [][] records = reader.ReadAll();
+                int line = 0;
+                foreach( string[] record in records )
+                {
+                    Console.WriteLine( ++line + ":" + ToString( record ) );
+                }
+            }
             catch (Exception ex)
             {
                 Assert.Fail(ex.Message);
             }
             finally
-			{
-				if( fileStream != null )
-				{
-					fileStream.Close();
-				}
-			}
-		}
+            {
+                if( fileStream != null )
+                {
+                    fileStream.Close();
+                }
+            }
+        }
 
-	}
+    }
 }
