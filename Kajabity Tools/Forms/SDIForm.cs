@@ -55,6 +55,7 @@ namespace Kajabity.Tools.Forms
 
         private void SDIForm_Load( object sender, System.EventArgs e )
         {
+            newDocument();
             DocumentChanged();
         }
 

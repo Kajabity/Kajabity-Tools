@@ -38,13 +38,13 @@ namespace HexViewer
 			// The InitializeComponent() call is required for Windows Forms designer support.
 			//
 			InitializeComponent();
-			
-			//
-			// TODO: Add constructor code after the InitializeComponent() call.
-			//
-		}
 
-		public override void DocumentChanged()
+            //
+            // TODO: Add constructor code after the InitializeComponent() call.
+            //
+        }
+
+        public override void DocumentChanged()
 		{
 			panel.BinaryDocument = (BinaryDocument) manager.Document;
 
