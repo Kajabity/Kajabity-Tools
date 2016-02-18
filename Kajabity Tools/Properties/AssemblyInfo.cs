@@ -30,11 +30,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Kajabity Tools")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A collection of C# utilities.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Kajabity.com")]
 [assembly: AssemblyProduct("Kajabity Tools")]
-[assembly: AssemblyCopyright( "Copyright 2009-15 Williams Technologies Limited." )]
+[assembly: AssemblyCopyright( "Copyright 2009-16 Williams Technologies Limited." )]
 [assembly: AssemblyTrademark("Kajabity")]
 [assembly: AssemblyCulture("")]
 

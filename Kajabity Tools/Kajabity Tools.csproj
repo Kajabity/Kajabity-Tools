@@ -102,6 +102,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Csv\CsvConstants.cs" />
     <Compile Include="Csv\CsvReader.cs" />
     <Compile Include="Csv\CsvWriter.cs" />
     <Compile Include="Csv\CsvParseException.cs" />
@@ -118,6 +119,9 @@
     <Compile Include="Java\JavaPropertyWriter.cs" />
     <Compile Include="Java\ParseException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Kajabity Tools.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="license.rtf" />
     <None Include="NOTICE.txt" />
   </ItemGroup>

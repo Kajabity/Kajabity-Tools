@@ -158,7 +158,7 @@ namespace Kajabity.Tools.Csv
 
                 Assert.AreEqual( 1, records.Length, "Should only be one record." );
 
-                Console.WriteLine( "REad :" + ToString( records[ 0 ] ) );
+                Console.WriteLine( "Read :" + ToString( records[ 0 ] ) );
 
                 Assert.AreEqual( record.Length, records[0].Length, "Should be " + record.Length + " fields in record." );
 
