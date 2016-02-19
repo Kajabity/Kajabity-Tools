@@ -27,7 +27,14 @@ namespace Kajabity.Tools.Forms
     /// </summary>
     public class TextDocument : Document
     {
-        private string text;
+        /// <summary>
+        /// A variable to hold the document's text - initialised to an empty string.
+        /// </summary>
+        private string text = String.Empty;
+
+        /// <summary>
+        /// The document's text as a string. Initialised to an empty string.
+        /// </summary>
         public string Text
         {
             get

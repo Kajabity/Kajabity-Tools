@@ -6,4 +6,4 @@ more collections in the future for other platforms - e.g. Java, JavaScript and W
 
 These pieces of code are intended to be built as a library or cut and pasted wherever needed.
 
-For much more details go to [http://www.kajabity.com/kajabity-tools/](http://www.kajabity.com/kajabity-tools/).
+For much more details go to [http://www.kajabity.com/content/kajabity-tools/](http://www.kajabity.com/content/kajabity-tools/).
