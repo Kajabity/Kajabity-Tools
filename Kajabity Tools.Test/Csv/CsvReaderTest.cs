@@ -327,9 +327,20 @@ namespace Kajabity.Tools.Csv
                 Assert.IsTrue(records.Length == 1, "Wrong number of records in " + filename);
 
                 int index = 0;
+
                 Assert.IsTrue(records[index].Length == 3, "Wrong number of items on record " + (index + 1));
-                Assert.IsTrue(CompareStringArray(new string[] { "A longer entry with some new\r\nlines\r\neven\r\n\r\na blank one.", "",
-                    "Quotes\r\n\" and \r\n\"\t\"TABS \r\nAND,commas" }, records[index]), "contents of record " + (index + 1));
+                Assert.IsTrue(CompareStringArray(new string[] 
+                {
+                    "A longer entry with some new" + Environment.NewLine + 
+                    "lines" + Environment.NewLine + 
+                    "even" + Environment.NewLine + 
+                    "" + Environment.NewLine + 
+                    "a blank one.",
+                    "",
+                    "Quotes" + Environment.NewLine + 
+                    "\" and " + Environment.NewLine + 
+                    "\"\t\"TABS " + Environment.NewLine + 
+                    "AND,commas" }, records[index]), "contents of record " + (index + 1));
             }
             catch (Exception ex)
             {
