@@ -65,6 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Test Data\Csv\different-quotes.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Test Data\Csv\simple.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

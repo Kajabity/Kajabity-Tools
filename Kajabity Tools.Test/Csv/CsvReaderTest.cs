@@ -38,6 +38,7 @@ namespace Kajabity.Tools.Csv
         private string QuotedLineBreaksTestFile;
         private string SpacesTestFile;
         private string DifferentNumberFieldsTestFile;
+        private string DifferentQuotesFile;
 
         private string MixedTestFile;
 
@@ -51,7 +52,7 @@ namespace Kajabity.Tools.Csv
         /// <summary>
         /// The directory where a copy of the CSV test data input files are placed.
         /// </summary>
-        protected static string CsvTestDataDirectory = "Cheese";
+        protected static string CsvTestDataDirectory;
 
         /// <summary>
         /// The directory where a copy of the CSV test data input files are placed.
@@ -89,6 +90,7 @@ namespace Kajabity.Tools.Csv
             MixedTestFile = Path.Combine(CsvTestDataDirectory, "mixed.csv");
             UnixLineEndsTestFile = Path.Combine(CsvTestDataDirectory, "unix-line-ends.csv");
             ErrorQuotesTestFile = Path.Combine(CsvTestDataDirectory, "error-quotes.csv");
+            DifferentQuotesFile = Path.Combine(CsvTestDataDirectory, "different-quotes.csv");
         }
 
 
@@ -329,17 +331,17 @@ namespace Kajabity.Tools.Csv
                 int index = 0;
 
                 Assert.IsTrue(records[index].Length == 3, "Wrong number of items on record " + (index + 1));
-                Assert.IsTrue(CompareStringArray(new string[] 
+                Assert.IsTrue(CompareStringArray(new string[]
                 {
-                    "A longer entry with some new" + Environment.NewLine + 
-                    "lines" + Environment.NewLine + 
-                    "even" + Environment.NewLine + 
-                    "" + Environment.NewLine + 
+                    "A longer entry with some new" + Environment.NewLine +
+                    "lines" + Environment.NewLine +
+                    "even" + Environment.NewLine +
+                    "" + Environment.NewLine +
                     "a blank one.",
                     "",
-                    "Quotes" + Environment.NewLine + 
-                    "\" and " + Environment.NewLine + 
-                    "\"\t\"TABS " + Environment.NewLine + 
+                    "Quotes" + Environment.NewLine +
+                    "\" and " + Environment.NewLine +
+                    "\"\t\"TABS " + Environment.NewLine +
                     "AND,commas" }, records[index]), "contents of record " + (index + 1));
             }
             catch (Exception ex)
@@ -547,5 +549,53 @@ namespace Kajabity.Tools.Csv
             }
         }
 
+
+        [Test]
+        public void TestCsvDifferentQuotesFile()
+        {
+            FileStream fileStream = null;
+            string filename = DifferentQuotesFile;
+
+            try
+            {
+                Console.WriteLine("Loading " + filename);
+                fileStream = File.OpenRead(filename);
+                CsvReader reader = new CsvReader(fileStream);
+
+                reader.Quote = '*';
+                string[][] records = reader.ReadAll();
+                int line = 0;
+
+                foreach (string[] record in records)
+                {
+                    Console.WriteLine(++line + ":" + ToString(record));
+                }
+
+                Assert.IsTrue(records.Length == 3, "Wrong number of records in " + filename);
+
+                int index = 0;
+                Assert.IsTrue(records[index].Length == 3, "Wrong number of items on record " + (index + 1));
+                Assert.IsTrue(CompareStringArray(new string[] { "aaa", "bbb", "ccc" }, records[index]), "contents of record " + (index + 1));
+
+                index++;
+                Assert.IsTrue(records[index].Length == 3, "Wrong number of items on record " + (index + 1));
+                Assert.IsTrue(CompareStringArray(new string[] { "", "new" + Environment.NewLine + "line", "quoted" }, records[index]), "contents of record " + (index + 1));
+
+                index++;
+                Assert.IsTrue(records[index].Length == 3, "Wrong number of items on record " + (index + 1));
+                Assert.IsTrue(CompareStringArray(new string[] { "with", "\"other\"", "quo\"\"te" }, records[index]), "contents of record " + (index + 1));
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
+            finally
+            {
+                if (fileStream != null)
+                {
+                    fileStream.Close();
+                }
+            }
+        }
     }
 }
