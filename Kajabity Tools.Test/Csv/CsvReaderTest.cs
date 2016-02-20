@@ -22,35 +22,82 @@ using System;
 using System.IO;
 using Kajabity.Tools.Test;
 using NUnit.Framework;
+using System.Reflection;
 
 namespace Kajabity.Tools.Csv
 {
     [TestFixture]
     public class CsvReaderTest : KajabityToolsTest
     {
-        private const string EmptyTestFile = CsvTestDataDirectory + "empty.csv";
-        private const string SimpleTestFile = CsvTestDataDirectory + "simple.csv";
-        private const string ThreeBlankLinesTestFile = CsvTestDataDirectory + "three-blank-lines.csv";
-        private const string EmptyFieldTestFile = CsvTestDataDirectory + "empty-field.csv";
-        private const string FieldNamesTestFile = CsvTestDataDirectory + "field-names.csv";
-        private const string QuotedTestFile = CsvTestDataDirectory + "quoted.csv";
-        private const string QuotedLineBreaksTestFile = CsvTestDataDirectory + "quoted-linebreaks.csv";
-        private const string SpacesTestFile = CsvTestDataDirectory + "spaces.csv";
-        private const string DifferentNumberFieldsTestFile = CsvTestDataDirectory + "different-number-fields.csv";
+        private string EmptyTestFile;
+        private string SimpleTestFile;
+        private string ThreeBlankLinesTestFile;
+        private string EmptyFieldTestFile;
+        private string FieldNamesTestFile;
+        private string QuotedTestFile;
+        private string QuotedLineBreaksTestFile;
+        private string SpacesTestFile;
+        private string DifferentNumberFieldsTestFile;
 
-        private const string MixedTestFile = CsvTestDataDirectory + "mixed.csv";
-        
+        private string MixedTestFile;
+
         // TODO: test reading error scenarios, 
-        private const string UnixLineEndsTestFile = CsvTestDataDirectory + "unix-line-ends.csv";
-        private const string ErrorQuotesTestFile = CsvTestDataDirectory + "error-quotes.csv";
+        private string UnixLineEndsTestFile;
+        private string ErrorQuotesTestFile;
         // TODO: test with alternate separator
         // TODO: Test reading fields to end of line with zero, one or more fields.
+
+
+        /// <summary>
+        /// The directory where a copy of the CSV test data input files are placed.
+        /// </summary>
+        protected static string CsvTestDataDirectory = "Cheese";
+
+        /// <summary>
+        /// The directory where a copy of the CSV test data input files are placed.
+        /// </summary>
+        protected static string CsvOutputDirectory;
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            Assembly assem = Assembly.GetExecutingAssembly();
+            string assemblyPath = Directory.GetParent(assem.Location).FullName;
+            string testDataDirectory = Path.Combine(assemblyPath, "Test Data");
+            string outputDirectory = Path.Combine(assemblyPath, "Output");
+
+            //Directory.CreateDirectory( OutputDirectory );
+
+            CsvTestDataDirectory = Path.Combine(testDataDirectory, "Csv");
+            CsvOutputDirectory = Path.Combine(outputDirectory, "Csv");
+
+            if (!Directory.Exists(CsvOutputDirectory))
+            {
+                Console.WriteLine("Creating CSV output directory :" + CsvOutputDirectory);
+                Directory.CreateDirectory(CsvOutputDirectory);
+            }
+
+            EmptyTestFile = Path.Combine(CsvTestDataDirectory, "empty.csv");
+            SimpleTestFile = Path.Combine(CsvTestDataDirectory, "simple.csv");
+            ThreeBlankLinesTestFile = Path.Combine(CsvTestDataDirectory, "three-blank-lines.csv");
+            EmptyFieldTestFile = Path.Combine(CsvTestDataDirectory, "empty-field.csv");
+            FieldNamesTestFile = Path.Combine(CsvTestDataDirectory, "field-names.csv");
+            QuotedTestFile = Path.Combine(CsvTestDataDirectory, "quoted.csv");
+            QuotedLineBreaksTestFile = Path.Combine(CsvTestDataDirectory, "quoted-linebreaks.csv");
+            SpacesTestFile = Path.Combine(CsvTestDataDirectory, "spaces.csv");
+            DifferentNumberFieldsTestFile = Path.Combine(CsvTestDataDirectory, "different-number-fields.csv");
+            MixedTestFile = Path.Combine(CsvTestDataDirectory, "mixed.csv");
+            UnixLineEndsTestFile = Path.Combine(CsvTestDataDirectory, "unix-line-ends.csv");
+            ErrorQuotesTestFile = Path.Combine(CsvTestDataDirectory, "error-quotes.csv");
+        }
+
+
 
         [Test]
         public void TestCsvEmptyFile()
         {
             FileStream fileStream = null;
-            const string filename = EmptyTestFile;
+            string filename = EmptyTestFile;
 
             try
             {
@@ -89,7 +136,7 @@ namespace Kajabity.Tools.Csv
         public void TestCsvSimpleFile()
         {
             FileStream fileStream = null;
-            const string filename = SimpleTestFile;
+            string filename = SimpleTestFile;
 
             try
             {
@@ -106,7 +153,7 @@ namespace Kajabity.Tools.Csv
                 }
 
                 Assert.IsTrue(records.Length == 2, "Wrong number of records in " + filename);
-                Assert.IsTrue(CompareStringArray( new string[] {"aaa","bbb","ccc"}, records[0]), "the first record");
+                Assert.IsTrue(CompareStringArray(new string[] { "aaa", "bbb", "ccc" }, records[0]), "the first record");
                 Assert.IsTrue(CompareStringArray(new string[] { "xxx", "yyy", "zzz" }, records[1]), "the second record");
             }
             catch (Exception ex)
@@ -126,7 +173,7 @@ namespace Kajabity.Tools.Csv
         public void TestCsvThreeBlankLinesFile()
         {
             FileStream fileStream = null;
-            const string filename = ThreeBlankLinesTestFile;
+            string filename = ThreeBlankLinesTestFile;
 
             try
             {
@@ -167,7 +214,7 @@ namespace Kajabity.Tools.Csv
         public void TestCsvEmptyFieldFile()
         {
             FileStream fileStream = null;
-            const string filename = EmptyFieldTestFile;
+            string filename = EmptyFieldTestFile;
 
             try
             {
@@ -218,7 +265,7 @@ namespace Kajabity.Tools.Csv
         public void TestCsvQuotedFile()
         {
             FileStream fileStream = null;
-            const string filename = QuotedTestFile;
+            string filename = QuotedTestFile;
 
             try
             {
@@ -261,7 +308,7 @@ namespace Kajabity.Tools.Csv
         public void TestCsvQuotedLineBreaksFile()
         {
             FileStream fileStream = null;
-            const string filename = QuotedLineBreaksTestFile;
+            string filename = QuotedLineBreaksTestFile;
 
             try
             {
@@ -301,7 +348,7 @@ namespace Kajabity.Tools.Csv
         public void TestCsvFieldNamesFile()
         {
             FileStream fileStream = null;
-            const string filename = FieldNamesTestFile;
+            string filename = FieldNamesTestFile;
 
             try
             {
@@ -339,7 +386,7 @@ namespace Kajabity.Tools.Csv
         public void TestCsvSpacesFile()
         {
             FileStream fileStream = null;
-            const string filename = SpacesTestFile;
+            string filename = SpacesTestFile;
 
             try
             {
@@ -375,7 +422,7 @@ namespace Kajabity.Tools.Csv
         public void TestCsvDifferentNumberFieldsFile()
         {
             FileStream fileStream = null;
-            const string filename = DifferentNumberFieldsTestFile;
+            string filename = DifferentNumberFieldsTestFile;
 
             try
             {
@@ -428,25 +475,25 @@ namespace Kajabity.Tools.Csv
             FileStream fileStream = null;
             try
             {
-                Console.WriteLine( "Loading " + MixedTestFile );
-                fileStream = File.OpenRead( MixedTestFile );
-                CsvReader reader = new CsvReader( fileStream );
+                Console.WriteLine("Loading " + MixedTestFile);
+                fileStream = File.OpenRead(MixedTestFile);
+                CsvReader reader = new CsvReader(fileStream);
 
-                string [][] records = reader.ReadAll();
+                string[][] records = reader.ReadAll();
                 int line = 0;
 
-                foreach( string[] record in records )
+                foreach (string[] record in records)
                 {
-                    Console.WriteLine( ++line + ":" + ToString( record ) );
+                    Console.WriteLine(++line + ":" + ToString(record));
                 }
             }
             catch (Exception ex)
             {
-                Assert.Fail( ex.Message );
+                Assert.Fail(ex.Message);
             }
             finally
             {
-                if( fileStream != null )
+                if (fileStream != null)
                 {
                     fileStream.Close();
                 }
@@ -456,24 +503,24 @@ namespace Kajabity.Tools.Csv
         [Test]
         public void TestCsvReadFieldAndRecord()
         {
-            Console.WriteLine("Loading " + MixedTestFile );
+            Console.WriteLine("Loading " + MixedTestFile);
             FileStream fileStream = null;
             try
             {
                 fileStream = File.OpenRead(MixedTestFile);
-                CsvReader reader = new CsvReader( fileStream );
+                CsvReader reader = new CsvReader(fileStream);
 
-                Console.WriteLine( "Line 1, Field 1: \"" + reader.ReadField() + "\"" );
+                Console.WriteLine("Line 1, Field 1: \"" + reader.ReadField() + "\"");
 
-                Console.WriteLine( "Rest of Line 1: \"" + ToString( reader.ReadRecord() ) + "\"" );
+                Console.WriteLine("Rest of Line 1: \"" + ToString(reader.ReadRecord()) + "\"");
 
-                Console.WriteLine( "Rest of File: " );
+                Console.WriteLine("Rest of File: ");
 
-                string [][] records = reader.ReadAll();
+                string[][] records = reader.ReadAll();
                 int line = 0;
-                foreach( string[] record in records )
+                foreach (string[] record in records)
                 {
-                    Console.WriteLine( ++line + ":" + ToString( record ) );
+                    Console.WriteLine(++line + ":" + ToString(record));
                 }
             }
             catch (Exception ex)
@@ -482,7 +529,7 @@ namespace Kajabity.Tools.Csv
             }
             finally
             {
-                if( fileStream != null )
+                if (fileStream != null)
                 {
                     fileStream.Close();
                 }

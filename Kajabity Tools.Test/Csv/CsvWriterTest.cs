@@ -22,20 +22,49 @@ using Kajabity.Tools.Test;
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Kajabity.Tools.Csv
 {
 	[TestFixture]
 	public class CsvWriterTest : KajabityToolsTest
 	{
-		//  ---------------------------------------------------------------------
-		//  Test CSV Reader
-		//  ---------------------------------------------------------------------
+        /// <summary>
+        /// The directory where a copy of the CSV test data input files are placed.
+        /// </summary>
+        protected static string CsvTestDataDirectory = "Cheese";
 
-		[Test]
+        /// <summary>
+        /// The directory where a copy of the CSV test data input files are placed.
+        /// </summary>
+        protected static string CsvOutputDirectory;
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            Assembly assem = Assembly.GetExecutingAssembly();
+            string assemblyPath = Directory.GetParent(assem.Location).FullName;
+            string testDataDirectory = Path.Combine(assemblyPath, "Test Data");
+            string outputDirectory = Path.Combine(assemblyPath, "Output");
+
+            CsvTestDataDirectory = Path.Combine(testDataDirectory, "Csv");
+            CsvOutputDirectory = Path.Combine(outputDirectory, "Csv");
+
+            if (!Directory.Exists(CsvOutputDirectory))
+            {
+                Console.WriteLine("Creating CSV output directory :" + CsvOutputDirectory);
+                Directory.CreateDirectory(CsvOutputDirectory);
+            }
+        }
+
+        //  ---------------------------------------------------------------------
+        //  Test CSV Reader
+        //  ---------------------------------------------------------------------
+
+        [Test]
 		public void TestCsvWriter()
 		{
-			const string filename = CsvTestDataDirectory + "mixed.csv";
+			string filename = CsvTestDataDirectory + "/mixed.csv";
 			FileStream inStream = null;
 			FileStream outStream = null;
 			try
@@ -45,7 +74,7 @@ namespace Kajabity.Tools.Csv
 				CsvReader reader = new CsvReader( inStream );
 				string [][] records = reader.ReadAll();
 
-				const string outName = CsvOutputDirectory + "test-writer.csv";
+				string outName = CsvOutputDirectory + "/test-writer.csv";
 				outStream = File.OpenWrite( outName );
 				outStream.SetLength( 0L );
 
@@ -76,7 +105,7 @@ namespace Kajabity.Tools.Csv
 		[Test]
 		public void TestWriteRecord()
 		{
-            string filename = CsvOutputDirectory + "test-write-record.csv";
+            string filename = CsvOutputDirectory + "/test-write-record.csv";
 			string [] record = new string[] { "AAAA", "BBBB", "CCCC" };
 			const int lenRecord = 14; // Strings, commas.
 
@@ -122,9 +151,9 @@ namespace Kajabity.Tools.Csv
         [Test]
         public void TestWriteAlternateSeparator()
         {
-            string filename = CsvOutputDirectory + "test-write-alternate-separator.csv";
+            string filename = CsvOutputDirectory + "/test-write-alternate-separator.csv";
             string[] record = new string[] { "AA,AA original separator", "BB|BB new separator", "CCCC" };
-            const int lenRecord = 14; // Strings, commas.
+            //const int lenRecord = 14; // Strings, commas.
 
             Stream stream = null;
             try

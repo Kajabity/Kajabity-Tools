@@ -19,7 +19,9 @@
  */
 
 using NUnit.Framework;
+using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Kajabity.Tools.Test
@@ -27,37 +29,6 @@ namespace Kajabity.Tools.Test
     [SetUpFixture]
     public class KajabityToolsTest
     {
-        protected const string TestDataDirectory = "Test Data/";
-
-        protected const string OutputDirectory = "Output/";
-
-        /// <summary>
-        /// The directory where a copy of the CSV test data input files are placed.
-        /// </summary>
-        protected const string CsvTestDataDirectory = TestDataDirectory + "Csv/";
-
-        /// <summary>
-        /// The directory where a copy of the CSV test data input files are placed.
-        /// </summary>
-        protected const string CsvOutputDirectory = OutputDirectory + "Csv/";
-
-        /// <summary>
-        /// The directory where a copy of the Java test data input files are placed.
-        /// </summary>
-        protected const string JavaTestDataDirectory = TestDataDirectory + "Java/";
-
-        /// <summary>
-        /// The directory where a copy of the Java test data input files are placed.
-        /// </summary>
-        protected const string JavaOutputDirectory = OutputDirectory + "Java/";
-
-        [SetUp]
-        public void SetUp()
-        {
-            //Directory.CreateDirectory( OutputDirectory );
-            Directory.CreateDirectory(CsvOutputDirectory);
-            Directory.CreateDirectory(JavaOutputDirectory);
-        }
 
 
         public static string ToString(string[] strings)
@@ -131,7 +102,7 @@ namespace Kajabity.Tools.Test
                 return false;
             }
 
-            for(int i = 0; i < a.Length; i++)
+            for (int i = 0; i < a.Length; i++)
             {
                 if (!a[i].Equals(b[i]))
                 {

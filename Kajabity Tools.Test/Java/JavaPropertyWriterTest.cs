@@ -24,21 +24,50 @@ using System.Text;
 using NUnit.Framework;
 
 using Kajabity.Tools.Test;
+using System.Reflection;
 
 namespace Kajabity.Tools.Java
 {
 	[TestFixture]
     public class JavaPropertyWriterTest : KajabityToolsTest
 	{
-		//  ---------------------------------------------------------------------
-		//  Simply test that it can write all the properties that it reads.
-		//  ---------------------------------------------------------------------
+        /// <summary>
+        /// The directory where a copy of the Java test data input files are placed.
+        /// </summary>
+        protected static string JavaTestDataDirectory;
 
-		[Test]
+        /// <summary>
+        /// The directory where a copy of the Java test data input files are placed.
+        /// </summary>
+        protected static string JavaOutputDirectory;
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            Assembly assem = Assembly.GetExecutingAssembly();
+            string assemblyPath = Directory.GetParent(assem.Location).FullName;
+            string testDataDirectory = Path.Combine(assemblyPath, "Test Data");
+            string outputDirectory = Path.Combine(assemblyPath, "Output");
+
+            JavaTestDataDirectory = Path.Combine(testDataDirectory, "Java");
+            JavaOutputDirectory = Path.Combine(outputDirectory, "Java");
+
+            if (!Directory.Exists(JavaOutputDirectory))
+            {
+                Console.WriteLine("Creating Java Properties output directory :" + JavaOutputDirectory);
+                Directory.CreateDirectory(JavaOutputDirectory);
+            }
+        }
+
+        //  ---------------------------------------------------------------------
+        //  Simply test that it can write all the properties that it reads.
+        //  ---------------------------------------------------------------------
+
+        [Test]
         public void TestJavaPropertyWriter()
 		{
-            const string filename = JavaTestDataDirectory + "mixed.properties";
-            const string outName = JavaOutputDirectory + "test-writer.properties";
+            string filename = JavaTestDataDirectory + "/mixed.properties";
+            string outName = JavaOutputDirectory + "/test-writer.properties";
 
             FileStream inStream = null;
             FileStream outStream = null;
