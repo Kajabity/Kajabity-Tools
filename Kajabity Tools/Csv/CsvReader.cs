@@ -147,13 +147,13 @@ namespace Kajabity.Tools.Csv
         /// Gets or sets the separator character used in the CSV stream - 
         /// default value is a comma (',').
         /// </summary>
-        public int Separator = ',';
+        public int Separator = CsvConstants.DEFAULT_SEPARATOR_CHAR;
 
         /// <summary>
         /// Gets or sets the quote character used in the CSV stream - default 
         /// value is a double quote ('"').
         /// </summary>
-        public int Quote = '"';
+        public int Quote = CsvConstants.DEFAULT_QUOTE_CHAR;
 
         //	---------------------------------------------------------------------
         //  Working data.

@@ -52,12 +52,19 @@ namespace Kajabity.Tools.Forms
         //  Constructors.
         //  ---------------------------------------------------------------------
 
+        /// <summary>
+        /// Construct an empty TextDocument.
+        /// </summary>
         public TextDocument()
         {
         }
 
-        public TextDocument( string name )
-            : base( name )
+        /// <summary>
+        /// Construct an emtpy TextDocument specifying the filename.
+        /// </summary>
+        /// <param name="filename">the filename of the text document.</param>
+        public TextDocument( string filename )
+            : base( filename )
         {
         }
 

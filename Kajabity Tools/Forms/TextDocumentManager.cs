@@ -24,63 +24,80 @@ using System.Diagnostics;
 
 namespace Kajabity.Tools.Forms
 {
-	/// <summary>
-	/// Description of TextDocumentManager.
-	/// </summary>
-	public class TextDocumentManager : DocumentManager
-	{
-		
-		public TextDocument TextDocument
-		{
-			get
-			{
-				return (TextDocument) document;
-			}
-		}
+    /// <summary>
+    /// A Document Manager for Text Documents.
+    /// </summary>
+    public class TextDocumentManager: DocumentManager
+    {
+        /// <summary>
+        /// Return the currently loaded document (cast to a TextDocument) or 
+        /// null if no document loaded.
+        /// </summary>
+        public TextDocument TextDocument
+        {
+            get
+            {
+                return (TextDocument) document;
+            }
+        }
 
         //  ---------------------------------------------------------------------
         //  Constructors.
         //  ---------------------------------------------------------------------
 
+        /// <summary>
+        /// Construct a TextDocumentManager setting the default document name and extension.
+        /// </summary>
         public TextDocumentManager()
-		{
-			DefaultName = "";
-			DefaultExtension = "txt";
-		}
+        {
+            DefaultName = "Text Document";
+            DefaultExtension = "txt";
+        }
 
         //  ---------------------------------------------------------------------
         //  Methods.
         //  ---------------------------------------------------------------------
 
-		public override void NewDocument()
-		{
-			document = new TextDocument();
+        /// <summary>
+        /// Create a new Text document.
+        /// </summary>
+        public override void NewDocument()
+        {
+            document = new TextDocument();
 
-			base.NewDocument();
-		}
+            base.NewDocument();
+        }
 
-		public override void Load( string filename )
-		{
-			Debug.WriteLine( "Loading " + filename );
-			
-			TextReader reader = new StreamReader( filename );
-			
-			TextDocument td = new TextDocument();
-			td.Text = reader.ReadToEnd();
-			reader.Close();
-			
-			document = td;
-			base.Load( filename );
-		}
+        /// <summary>
+        /// Loads a text document from filename.
+        /// </summary>
+        /// <param name="filename">the name of the file to load as a text document.</param>
+        public override void Load( string filename )
+        {
+            Debug.WriteLine( "Loading " + filename );
 
-		public override void Save( string filename )
-		{
-			TextWriter writer = new StreamWriter( filename );
+            TextReader reader = new StreamReader( filename );
 
-			writer.Write( ((TextDocument) document).Text );
-			writer.Close();
+            TextDocument td = new TextDocument();
+            td.Text = reader.ReadToEnd();
+            reader.Close();
 
-			base.Save( filename );
-		}
-	}
+            document = td;
+            base.Load( filename );
+        }
+
+        /// <summary>
+        /// Saves the currently loaded text document to filename.
+        /// </summary>
+        /// <param name="filename">the name of the file to save the text document into.</param>
+        public override void Save( string filename )
+        {
+            TextWriter writer = new StreamWriter( filename );
+
+            writer.Write( ((TextDocument) document).Text );
+            writer.Close();
+
+            base.Save( filename );
+        }
+    }
 }

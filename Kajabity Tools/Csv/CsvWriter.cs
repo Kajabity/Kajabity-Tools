@@ -45,12 +45,12 @@ namespace Kajabity.Tools.Csv
         /// Any string containing the following characters needs to be quoted and
         /// any quote characters doubled up.
         /// </summary>
-        private char[] escapeChars = new char[] { ',', '"', '\n', '\r' };
+        private char[] escapeChars = new char[] { CsvConstants.DEFAULT_SEPARATOR_CHAR, CsvConstants.DEFAULT_QUOTE_CHAR, '\n', '\r' };
 
         /// <summary>
         /// The separator between fields in a single CSV record (line).
         /// </summary>
-        private char separator = ',';
+        private char separator = CsvConstants.DEFAULT_SEPARATOR_CHAR;
 
         /// <summary>
         /// Gets or sets the separator character used in the file - default
@@ -74,7 +74,7 @@ namespace Kajabity.Tools.Csv
         /// <summary>
         /// The character used to quote a single field in a CSV record (line).
         /// </summary>
-        private char quote = '"';
+        private char quote = CsvConstants.DEFAULT_QUOTE_CHAR;
 
         /// <summary>
         /// Gets or sets the quote character used in the file - default

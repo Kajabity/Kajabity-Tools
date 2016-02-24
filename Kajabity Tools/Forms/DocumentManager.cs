@@ -48,7 +48,7 @@ namespace Kajabity.Tools.Forms
                 defaultExtension = value;
             }
         }
-        
+
         private string defaultName = "Document";
 
         /// <summary>
@@ -65,11 +65,11 @@ namespace Kajabity.Tools.Forms
                 defaultName = value;
             }
         }
-        
+
         private string filename = null;
 
         /// <summary>
-        /// The filename of the current document.
+        /// The filename of the current document.  Will be null of no current document.
         /// </summary>
         public string Filename
         {
@@ -82,7 +82,7 @@ namespace Kajabity.Tools.Forms
         private bool newfile = true;
 
         /// <summary>
-        ///	An indication of whether there is a filename applied.
+        ///	Returns true if the current document (if any) is new and unsaved.
         /// </summary>
         public bool NewFile
         {
@@ -91,13 +91,16 @@ namespace Kajabity.Tools.Forms
                 return newfile;
             }
         }
-        
+
         /// <summary>
         /// Counts the number of documents openned by this instance of the Document Manager to 
-        /// allow default filenames to be more unique.
+        /// allow default filenames to be a little more unique.
         /// </summary>
         private int docCount = 0;
-        
+
+        /// <summary>
+        /// Holds a reference to the currently loaded document - or null if none loaded.
+        /// </summary>
         protected Document document = null;
 
         /// <summary>
@@ -110,7 +113,7 @@ namespace Kajabity.Tools.Forms
                 return document;
             }
         }
-        
+
         /// <summary>
         /// Returns true this instance has a document.
         /// </summary>
@@ -121,9 +124,9 @@ namespace Kajabity.Tools.Forms
                 return document != null;
             }
         }
-        
+
         /// <summary>
-        /// Tests if a document is Opened and is modified.
+        /// Tests if a document is both Opened and modified.
         /// </summary>
         public bool Modified
         {
@@ -137,6 +140,9 @@ namespace Kajabity.Tools.Forms
         //  Constructors.
         //  ---------------------------------------------------------------------
 
+        /// <summary>
+        /// Construct an empty DocumentManager instance.
+        /// </summary>
         public DocumentManager()
         {
         }
@@ -145,24 +151,36 @@ namespace Kajabity.Tools.Forms
         //  Methods.
         //  ---------------------------------------------------------------------
 
+        /// <summary>
+        /// Performs base initialisation of the document name and status of a 
+        /// new document.  Override this method to provide initialisation for
+        /// specific Document types then call this base class 
+        /// once document set (<code>base.NewDocument();</code>).
+        /// </summary>
         public virtual void NewDocument()
         {
-            string documentName = String.Format( defaultName + "." + defaultExtension, ++docCount );
+            string documentName = String.Format(defaultName + "." + defaultExtension, ++docCount);
             filename = documentName;
             newfile = true;
 
-            if( document != null )
+            if (document != null)
             {
                 document.Name = documentName;
             }
         }
 
-        public virtual void Load( string filename )
+        /// <summary>
+        /// Performs base class setup of loaded filename and status.  Override 
+        /// to load a file into a Document instance then call this base class 
+        /// once document set (<code>base.Load(filename);</code>).
+        /// </summary>
+        /// <param name="filename">filename and path loaded</param>
+        public virtual void Load(string filename)
         {
             this.filename = filename;
             newfile = false;
 
-            if( document != null )
+            if (document != null)
             {
                 FileInfo fileInfo = new FileInfo(filename);
                 document.Name = fileInfo.Name;
@@ -170,12 +188,18 @@ namespace Kajabity.Tools.Forms
             }
         }
 
-        public virtual void Save( string filename )
+        /// <summary>
+        /// Performs base class setup of Saved filename and status.  Override 
+        /// to save a file from a Document instance then call this base class 
+        /// (<code>base.Save(filename);</code>).
+        /// </summary>
+        /// <param name="filename">filename and path to save to</param>
+        public virtual void Save(string filename)
         {
             this.filename = filename;
             newfile = false;
 
-            if( document != null )
+            if (document != null)
             {
                 FileInfo fileInfo = new FileInfo(filename);
                 document.Name = fileInfo.Name;
@@ -183,10 +207,17 @@ namespace Kajabity.Tools.Forms
             }
         }
 
+        /// <summary>
+        /// Close any currently open document - setting state appropriately.  
+        /// Override this method to perform any necessary cleanup (releasing 
+        /// resources, etc.) for the Document instance then call this base 
+        /// class (<code>base.Close();</code>).
+        /// </summary>
         public virtual void Close()
         {
             document = null;
             newfile = false;
+            filename = null;
         }
     }
 }
