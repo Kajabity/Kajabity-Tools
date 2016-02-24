@@ -78,7 +78,6 @@ deploy:
   - provider: GitHub 
     release: kajabity.tools-v$(appveyor_build_version)
     description: 'Kajabity Tools Release v$(appveyor_build_version)'
-    provider: GitHub
     auth_token:
         secure: qyEhOXLpH0txl0uO1Y3k99DUnjxsF2bmZydo8h7g05/fyNs+uj/ge+Qg273TsVU1
     draft: false
