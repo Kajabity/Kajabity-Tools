@@ -53,7 +53,8 @@ artifacts:
 
     - path: Samples\TextEditor\bin\$(configuration)\TextEditor.exe
 
-    - path: '**\*.nupkg' # find all NuGet packages recursively
+      # Being more specific to avoid also identifying NUnit as an artefact.
+    - path: Kajabity Tools\bin\$(configuration)\*.nupkg
 
 #---------------------------------# 
 #     deployment configuration    # 
