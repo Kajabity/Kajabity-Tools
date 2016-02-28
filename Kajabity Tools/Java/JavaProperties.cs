@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Text;
+
 
 namespace Kajabity.Tools.Java
 {
@@ -32,11 +34,16 @@ namespace Kajabity.Tools.Java
 	/// </summary>
 	public class JavaProperties : Hashtable
 	{
-		/// <summary>
-		/// A reference to an optional set of default properties - these values are returned
-		/// if the value has not been loaded from a ".properties" file or set programatically.
-		/// </summary>
-		protected Hashtable defaults;
+        /// <summary>
+        /// Gets a reference to the ISO-8859-1 encoding (code page 28592). This is the Java standard for .properties files.
+        /// </summary>
+        internal static Encoding DefaultEncoding { get { return Encoding.GetEncoding( 28592 ); } }
+
+        /// <summary>
+        /// A reference to an optional set of default properties - these values are returned
+        /// if the value has not been loaded from a ".properties" file or set programatically.
+        /// </summary>
+        protected Hashtable defaults;
 
 		/// <summary>
 		/// An empty constructor that doesn't set the defaults.
@@ -67,18 +74,24 @@ namespace Kajabity.Tools.Java
 			reader.Parse( streamIn );
 		}
 
-		/// <summary>
-		/// Store the contents of this collection of properties to the stream in the format
-		/// used for Java ".properties" files using an instance of <see cref="JavaPropertyWriter"/>.
-		/// The keys and values will be minimally escaped to ensure special characters are read back
-		/// in properly.  Keys are not sorted.  The file will begin with a comment identifying the
-		/// date - and an additional comment may be included.
-		/// 
-		/// 
-		/// </summary>
-		/// <param name="streamOut">An output stream to write the properties to.</param>
-		/// <param name="comments">Optional additional comment to include at the head of the output.</param>
-		public void Store( Stream streamOut, string comments )
+        public void Load( Stream streamIn, Encoding encoding )
+        {
+            JavaPropertyReader reader = new JavaPropertyReader( this );
+            reader.Parse( streamIn, encoding);
+        }
+
+        /// <summary>
+        /// Store the contents of this collection of properties to the stream in the format
+        /// used for Java ".properties" files using an instance of <see cref="JavaPropertyWriter"/>.
+        /// The keys and values will be minimally escaped to ensure special characters are read back
+        /// in properly.  Keys are not sorted.  The file will begin with a comment identifying the
+        /// date - and an additional comment may be included.
+        /// 
+        /// 
+        /// </summary>
+        /// <param name="streamOut">An output stream to write the properties to.</param>
+        /// <param name="comments">Optional additional comment to include at the head of the output.</param>
+        public void Store( Stream streamOut, string comments )
 		{
 			JavaPropertyWriter writer = new JavaPropertyWriter( this );
 			writer.Write( streamOut, comments );
