@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ using System.IO;
 using System.Text;
 
 using System.Diagnostics;
+using System.Globalization;
+
 
 namespace Kajabity.Tools.Java
 {
@@ -60,7 +62,7 @@ namespace Kajabity.Tools.Java
             "STATE_before_separator", "STATE_after_separator", "STATE_value", "STATE_value_escape", 
             "STATE_value_ws", "STATE_finish" };
         
-        private static int [][] states = new int[][] {
+        private static readonly int [][] states = new int[][] {
             new int[]{//STATE_start
                 MATCH_end_of_input,	STATE_finish,			ACTION_ignore,
                 MATCH_terminator,	STATE_start,			ACTION_ignore,
@@ -123,7 +125,7 @@ namespace Kajabity.Tools.Java
             },
             new int[]{//STATE_value_escape
                 MATCH_terminator,	STATE_value_ws,			ACTION_ignore,
-                MATCH_any,			STATE_value,				ACTION_add_to_value
+                MATCH_any,			STATE_value,			ACTION_add_to_value
             },
             new int[]{//STATE_value_ws
                 MATCH_end_of_input,	STATE_finish,			ACTION_store_property,
@@ -225,8 +227,86 @@ namespace Kajabity.Tools.Java
         /// <param name="stream">The input stream that the properties are read from.</param>
         public void Parse( Stream stream )
         {
-            reader = new BufferedStream( stream, bufferSize );
-            //TODO: Read using correct encoding ISO-8859-1 encoding (code page 28592).
+            Parse( stream, null );
+        }
+        /// <summary>
+        /// <para>Load key value pairs (properties) from an input Stream expected to have ISO-8859-1 encoding (code page 28592).  
+        /// The input stream (usually reading from a ".properties" file) consists of a series of lines (terminated 
+        /// by \r, \n or \r\n) each a key value pair, a comment or a blank line.</para>
+        /// 
+        /// <para>Leading whitespace (spaces, tabs, formfeeds) are ignored at the start of any line - and a line that is empty or 
+        /// contains only whitespace is blank and ignored.</para>
+        /// 
+        /// <para>A line with the first non-whitespace character is a '#' or '!' is a comment line and the rest of the line is 
+        /// ignored.</para>
+        /// 
+        /// <para>If the first non-whitespace character is not '#' or '!' then it is the start of a key.  A key is all the
+        /// characters up to the first whitespace or a key/value separator - '=' or ':'.</para>
+        /// 
+        /// <para>The separator is optional.  Any whitespace after the key or after the separator (if present) is ignored.</para>
+        /// 
+        /// <para>The first non-whitespace character after the separator (or after the key if no separator) begins the value.  
+        /// The value may include whitespace, separators, or comment characters.</para>
+        /// 
+        /// <para>Any unicode character may be included in either key or value by using escapes preceded by the escape 
+        /// character '\'.</para>
+        /// 
+        /// <para>The following special cases are defined:</para>
+        /// <code>
+        /// 	'\t' - horizontal tab.
+        /// 	'\f' - form feed.
+        /// 	'\r' - return
+        /// 	'\n' - new line
+        /// 	'\\' - add escape character.
+        /// 
+        /// 	'\ ' - add space in a key or at the start of a value.
+        /// 	'\!', '\#' - add comment markers at the start of a key.
+        /// 	'\=', '\:' - add a separator in a key.
+        /// </code>
+        /// 
+        /// <para>Any unicode character using the following escape:</para>
+        /// <code>
+        /// 	'\uXXXX' - where XXXX represents the unicode character code as 4 hexadecimal digits.
+        /// </code>
+        /// 
+        /// <para>Finally, longer lines can be broken by putting an escape at the very end of the line.  Any leading space
+        /// (unless escaped) is skipped at the beginning of the following line.</para>
+        /// 
+        /// Examples
+        /// <code>
+        /// 	a-key = a-value
+        /// 	a-key : a-value
+        /// 	a-key=a-value
+        /// 	a-key a-value
+        /// </code>
+        /// 
+        /// <para>All the above will result in the same key/value pair - key "a-key" and value "a-value".</para>
+        /// <code>
+        /// 	! comment...
+        /// 	# another comment...
+        /// </code>
+        /// 
+        /// <para>The above are two examples of comments.</para>
+        /// <code>
+        /// 	Honk\ Kong = Near China
+        /// </code>
+        /// 
+        /// <para>The above shows how to embed a space in a key - key is "Hong Kong", value is "Near China".</para>
+        /// <code>
+        /// 	a-longer-key-example = a really long value that is \
+        /// 			split over two lines.
+        /// </code>
+        /// 
+        /// <para>An example of a long line split into two.</para>
+        /// </summary>
+        /// <param name="stream">The input stream that the properties are read from.</param>
+        /// <param name="encoding">The <see cref="System.Text.Encoding">encoding</see> that is used to read the properies file stream.</param>
+        public void Parse( Stream stream, Encoding encoding )
+        {
+            var bufferedStream = new BufferedStream( stream, bufferSize );
+            // the default encoding ISO-8859-1 (codepabe 28592) will be used if we do not pass explicitly different encoding
+            var parserEncoding = encoding ?? JavaProperties.DefaultEncoding;
+            reader = new BinaryReader( bufferedStream, parserEncoding );
 
             int state = STATE_start;
             do
@@ -365,7 +445,8 @@ namespace Kajabity.Tools.Java
             return (char) ch;
         }
 
-        private BufferedStream reader = null;
+        // we now use a BinaryReader, which supports encodings
+        private BinaryReader reader = null;
         private int savedChar;
         private bool saved = false;
 
@@ -377,9 +458,9 @@ namespace Kajabity.Tools.Java
                 return savedChar;
             }
 
-            return reader.ReadByte();
+            return ReadCharSafe();
         }
-        
+
         private int peekChar()
         {
             if( saved )
@@ -388,7 +469,29 @@ namespace Kajabity.Tools.Java
             }
             
             saved = true;
-            return savedChar = reader.ReadByte();
+            return savedChar = ReadCharSafe();
+        }
+
+        /// <summary>
+        /// A method to substitute calls to <c>stream.ReadByte()</c>.
+        /// The <see cref="JavaPropertyReader" /> now uses a <see cref="BinaryReader"/> to read properties.
+        /// Unlike a plain stream, the <see cref="BinaryReader"/> will not return -1 when the stream end is reached,
+        /// instead an <see cref="IOException" /> is to be thrown. 
+        /// <para>
+        /// In this method we perform a check if the stream is already processed to the end, and return <c>-1</c>.
+        /// </para>
+        /// </summary>
+        /// <returns></returns>
+        private int ReadCharSafe()
+        {
+            if (this.reader.BaseStream.Position == this.reader.BaseStream.Length)
+            {
+                // We have reached the end of the stream. The reder will throw exception if we call Read any further.
+                // We just return -1 now;
+                return -1;
+            }
+            // reader.ReadChar() will take into account the encoding.
+            return this.reader.ReadChar();
         }
     }
 }
