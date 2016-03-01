@@ -229,6 +229,7 @@ namespace Kajabity.Tools.Java
         {
             Parse( stream, null );
         }
+
         /// <summary>
         /// <para>Load key value pairs (properties) from an input Stream expected to have ISO-8859-1 encoding (code page 28592).  
         /// The input stream (usually reading from a ".properties" file) consists of a series of lines (terminated 
