@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ namespace Kajabity.Tools.Csv
         /// <summary>
         /// Used in debug and error reporting.
         /// </summary>
-        private static readonly string [] StateNames =
+        private static readonly string[] StateNames =
         {
             "Start", "Field", "Quoted", "Double Quote", "SkipTrailingSpace", "End of Field", "End of Line", "End of File"
         };
@@ -76,7 +76,7 @@ namespace Kajabity.Tools.Csv
         /// The State Machine - an array of states, each an array of transitions, and each of those 
         /// an array of integers grouped in threes - { match condition, next state, action to perform }.
         /// </summary>
-        private static readonly int [][] States =
+        private static readonly int[][] States =
         {
             new int[]{//STATE_Start
                 //MATCH_WhiteSpace,       STATE_Start,            ACTION_none,
@@ -129,7 +129,7 @@ namespace Kajabity.Tools.Csv
         /// <summary>
         /// The size of the buffer used to read the input data.
         /// </summary>	
-        private const int BufferSize =  1000;
+        private const int BufferSize = 1000;
 
         //	---------------------------------------------------------------------
         //  The result.
@@ -144,10 +144,16 @@ namespace Kajabity.Tools.Csv
         //	---------------------------------------------------------------------
 
         /// <summary>
-        /// Gets or sets the separator character used in the CSV stream - default value is a
-        /// comma (",").
+        /// Gets or sets the separator character used in the CSV stream - 
+        /// default value is a comma (',').
         /// </summary>
-        public int Separator = ',';
+        public int Separator = CsvConstants.DEFAULT_SEPARATOR_CHAR;
+
+        /// <summary>
+        /// Gets or sets the quote character used in the CSV stream - default 
+        /// value is a double quote ('"').
+        /// </summary>
+        public int Quote = CsvConstants.DEFAULT_QUOTE_CHAR;
 
         //	---------------------------------------------------------------------
         //  Working data.
@@ -186,9 +192,9 @@ namespace Kajabity.Tools.Csv
         /// Construct a inStream.
         /// </summary>
         /// <param name="stream">The input stream to read from.</param>
-        public CsvReader( Stream stream )
+        public CsvReader(Stream stream)
         {
-            inStream = new BufferedStream( stream, BufferSize );
+            inStream = new BufferedStream(stream, BufferSize);
         }
 
         //  ---------------------------------------------------------------------
@@ -203,18 +209,18 @@ namespace Kajabity.Tools.Csv
         public string ReadField()
         {
             // Check we haven't passed the end of the line/file.
-            if( state > STATE_EndField )
+            if (state > STATE_EndField)
             {
                 return null;
             }
 
             // Parse the next field.
-            Parse( STATE_EndField );
+            Parse(STATE_EndField);
 
             // Return and remove the last field.
-            string field = (string) fieldList[ fieldList.Count - 1 ];
+            string field = (string)fieldList[fieldList.Count - 1];
             //Debug.WriteLine( "ReadField: \"" + field + "\"" );
-            fieldList.RemoveAt( fieldList.Count - 1 );
+            fieldList.RemoveAt(fieldList.Count - 1);
             return field;
         }
 
@@ -222,20 +228,20 @@ namespace Kajabity.Tools.Csv
         /// Read to the end of the current record, if any.
         /// </summary>
         /// <returns>The current record - or null if at end of file.</returns>
-        public string [] ReadRecord()
+        public string[] ReadRecord()
         {
             // Check we haven't passed the end of the file.
-            if( state > STATE_EndLine )
+            if (state > STATE_EndLine)
             {
                 return null;
             }
 
             // Parse to the end of the current line.
-            Parse( STATE_EndLine );
+            Parse(STATE_EndLine);
 
             // Return and remove the last field.
-            string [] record = (string []) rowList[ rowList.Count - 1 ];
-            rowList.RemoveAt( rowList.Count - 1 );
+            string[] record = (string[])rowList[rowList.Count - 1];
+            rowList.RemoveAt(rowList.Count - 1);
             return record;
         }
 
@@ -244,19 +250,19 @@ namespace Kajabity.Tools.Csv
         /// </summary>
         /// <returns>an array of string arrays, each row representing a row of values from the CSV file - or null if
         /// already at the end of the file.</returns>
-        public string [][] ReadAll()
+        public string[][] ReadAll()
         {
             // Check we haven't passed the end of the file.
-            if( state == STATE_EndFile )
+            if (state == STATE_EndFile)
             {
                 return null;
             }
 
             // Parse to the end of the file.
-            Parse( STATE_EndFile );
+            Parse(STATE_EndFile);
 
             // Return and remove the last field.
-            string [][] records = (string [][]) rowList.ToArray( typeof (string []) );
+            string[][] records = (string[][])rowList.ToArray(typeof(string[]));
             rowList.Clear();
             return records;
         }
@@ -269,9 +275,9 @@ namespace Kajabity.Tools.Csv
         /// by indicating which state to finish on.</param>
         /// <exception cref="T:CsvParseException">Thrown when an unexpected/invalid character 
         /// is encountered in the input stream.</exception>
-        private void Parse( int finalSate )
+        private void Parse(int finalSate)
         {
-            if( finalSate >= STATE_EndFile )
+            if (finalSate >= STATE_EndFile)
             {
                 finalSate = STATE_EndFile;
             }
@@ -282,7 +288,7 @@ namespace Kajabity.Tools.Csv
             {
                 bool matched = false;
 
-                if( lambda )
+                if (lambda)
                 {
                     lambda = false;
                 }
@@ -291,31 +297,31 @@ namespace Kajabity.Tools.Csv
                     ch = NextChar();
                 }
 
-                for( int s = 0; s < States[ state ].Length; s += 3 )
+                for (int s = 0; s < States[state].Length; s += 3)
                 {
-                    if( Matches( States[ state ][ s ], ch ) )
+                    if (Matches(States[state][s], ch))
                     {
                         //Debug.WriteLine( stateNames[ state ] + ", " + (s/3) + ", " + ch + (ch>20?" (" + (char) ch + ")" : "") );
                         matched = true;
 
-                        if( States[ state ][ s ] == MATCH_none )
+                        if (States[state][s] == MATCH_none)
                         {
                             lambda = true;
                         }
 
-                        DoAction( States[ state ][ s + 2 ], ch );
+                        DoAction(States[state][s + 2], ch);
 
-                        state = States[ state ][ s + 1 ];
+                        state = States[state][s + 1];
                         break;
                     }
                 }
 
-                if( !matched )
+                if (!matched)
                 {
-                    throw new CsvParseException( "Unexpected character at state " + StateNames[ state ] + ": <<<" + (char) ch + ">>>" );
+                    throw new CsvParseException("Unexpected character at state " + StateNames[state] + ": <<<" + (char)ch + ">>>");
                 }
             }
-            while( state < finalSate );
+            while (state < finalSate);
         }
 
         /// <summary>
@@ -324,49 +330,49 @@ namespace Kajabity.Tools.Csv
         /// <param name="match">The number of the MATCH_* test to try.</param>
         /// <param name="ch">The character to test.</param>
         /// <returns></returns>
-        private bool Matches( int match, int ch )
+        private bool Matches(int match, int ch)
         {
             ExtraLinefeedChar = 0;
 
-            switch( match )
+            switch (match)
             {
-            case MATCH_none:
-                return true;
+                case MATCH_none:
+                    return true;
 
-            case MATCH_Separator:
-                return ch == Separator;
+                case MATCH_Separator:
+                    return ch == Separator;
 
-            case MATCH_EOF:
-                return ch == -1;
+                case MATCH_EOF:
+                    return ch == -1;
 
-            case MATCH_LineFeed:
-                if( ch == '\r' )
-                {
-                    if( PeekChar() == '\n')
+                case MATCH_LineFeed:
+                    if (ch == '\r')
                     {
-                        ExtraLinefeedChar = '\n';
-                        saved = false;
+                        if (PeekChar() == '\n')
+                        {
+                            ExtraLinefeedChar = '\n';
+                            saved = false;
+                        }
+                        return true;
                     }
+                    if (ch == '\n')
+                    {
+                        return true;
+                    }
+                    return false;
+
+                case MATCH_DoubleQuote:
+                    return ch == Quote;
+
+                case MATCH_WhiteSpace:
+                    return ch == ' ' || ch == '\t' || ch == '\v';
+
+                case MATCH_Any:
                     return true;
-                }
-                if( ch == '\n' )
-                {
-                    return true;
-                }
-                return false;
 
-            case MATCH_DoubleQuote:
-                return ch == '"';
-
-            case MATCH_WhiteSpace:
-                return ch == ' ' || ch == '\t' || ch == '\v';
-
-            case MATCH_Any:
-                return true;
-
-            default:  // Allows the match char to be the 'MATCH' parameter.
-                //return ch == match;
-                return false;
+                default:  // Allows the match char to be the 'MATCH' parameter.
+                          //return ch == match;
+                    return false;
             }
         }
 
@@ -375,36 +381,36 @@ namespace Kajabity.Tools.Csv
         /// </summary>
         /// <param name="action">The number of the action to perform.</param>
         /// <param name="ch">The character matched in the state.</param>
-        private void DoAction( int action, int ch )
+        private void DoAction(int action, int ch)
         {
-            switch( action )
+            switch (action)
             {
-            case ACTION_none:
-                break;
+                case ACTION_none:
+                    break;
 
-            case ACTION_SaveField:  // Append the field to the fieldList as a String.
-                //Debug.WriteLine( "ACTION_SaveField: \"" + fieldBuilder.ToString() + "\"" );
-                fieldList.Add( fieldBuilder.ToString() );
-                fieldBuilder.Length = 0;
-                break;
+                case ACTION_SaveField:  // Append the field to the fieldList as a String.
+                                        //Debug.WriteLine( "ACTION_SaveField: \"" + fieldBuilder.ToString() + "\"" );
+                    fieldList.Add(fieldBuilder.ToString());
+                    fieldBuilder.Length = 0;
+                    break;
 
-            case ACTION_SaveLine:   // Append the line to the rowList as an array of strings.
-                //Debug.Write( "ACTION_SaveLine: \"" + fieldBuilder.ToString() + "\"" );
-                fieldList.Add( fieldBuilder.ToString() );
-                fieldBuilder.Length = 0;
+                case ACTION_SaveLine:   // Append the line to the rowList as an array of strings.
+                                        //Debug.Write( "ACTION_SaveLine: \"" + fieldBuilder.ToString() + "\"" );
+                    fieldList.Add(fieldBuilder.ToString());
+                    fieldBuilder.Length = 0;
 
-                //Debug.WriteLine( " - " + fieldList.Count + " fields" );
-                rowList.Add( fieldList.ToArray( typeof (string) ) );
-                fieldList.Clear();
-                break;
+                    //Debug.WriteLine( " - " + fieldList.Count + " fields" );
+                    rowList.Add(fieldList.ToArray(typeof(string)));
+                    fieldList.Clear();
+                    break;
 
-            case ACTION_AppendToField:
-                fieldBuilder.Append( (char) ch );
-                break;
+                case ACTION_AppendToField:
+                    fieldBuilder.Append((char)ch);
+                    break;
 
-            case ACTION_AppendLineFeedToField:
-                fieldBuilder.Append( (char) ch ).Append( (char) ExtraLinefeedChar );
-                break;
+                case ACTION_AppendLineFeedToField:
+                    fieldBuilder.Append((char)ch).Append((char)ExtraLinefeedChar);
+                    break;
             }
         }
 
@@ -414,7 +420,7 @@ namespace Kajabity.Tools.Csv
         /// <returns>The next character from the stream.</returns>
         private int NextChar()
         {
-            if( saved )
+            if (saved)
             {
                 saved = false;
                 return savedChar;
@@ -430,7 +436,7 @@ namespace Kajabity.Tools.Csv
         /// <returns>The next character from the stream.</returns>
         private int PeekChar()
         {
-            if( saved )
+            if (saved)
             {
                 return savedChar;
             }

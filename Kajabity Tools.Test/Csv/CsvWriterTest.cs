@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,161 +22,258 @@ using Kajabity.Tools.Test;
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Kajabity.Tools.Csv
 {
-	[TestFixture]
-	public class CsvWriterTest : KajabityToolsTest
-	{
-		//  ---------------------------------------------------------------------
-		//  Test CSV Reader
-		//  ---------------------------------------------------------------------
+    [TestFixture]
+    public class CsvWriterTest : KajabityToolsTest
+    {
+        private string MixedTestFile;
 
-		[Test]
-		public void TestCsvWriter()
-		{
-			const string filename = CsvTestDataDirectory + "mixed.csv";
-			FileStream inStream = null;
-			FileStream outStream = null;
-			try
-			{
-                Console.WriteLine( "Loading " + filename );
-				inStream = File.OpenRead( filename );
-				CsvReader reader = new CsvReader( inStream );
-				string [][] records = reader.ReadAll();
+        /// <summary>
+        /// The directory where a copy of the CSV test data input files are placed.
+        /// </summary>
+        protected static string CsvTestDataDirectory;
 
-				const string outName = CsvOutputDirectory + "test-writer.csv";
-				outStream = File.OpenWrite( outName );
-				outStream.SetLength( 0L );
+        /// <summary>
+        /// The directory where a copy of the CSV test data input files are placed.
+        /// </summary>
+        protected static string CsvOutputDirectory;
 
-				CsvWriter writer = new CsvWriter( outStream );
-				//writer.QuoteLimit = -1;
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            Assembly assem = Assembly.GetExecutingAssembly();
+            string assemblyPath = Directory.GetParent(assem.Location).FullName;
+            string testDataDirectory = Path.Combine(assemblyPath, "Test Data");
+            string outputDirectory = Path.Combine(assemblyPath, "Output");
 
-				writer.WriteAll( records );
-				outStream.Flush();
-			}
-            catch (Exception ex)
+            CsvTestDataDirectory = Path.Combine(testDataDirectory, "Csv");
+            CsvOutputDirectory = Path.Combine(outputDirectory, "Csv");
+
+            if (!Directory.Exists(CsvOutputDirectory))
             {
-                Assert.Fail( ex.Message );
+                Console.WriteLine("Creating CSV output directory :" + CsvOutputDirectory);
+                Directory.CreateDirectory(CsvOutputDirectory);
             }
-            finally
-			{
-				if( inStream != null )
-				{
-					inStream.Close();
-				}
 
-				if( outStream != null )
-				{
-					outStream.Close();
-				}
-			}
-		}
-		
-		[Test]
-		public void TestWriteRecord()
-		{
-            string filename = CsvOutputDirectory + "test-write-record.csv";
-			string [] record = new string[] { "AAAA", "BBBB", "CCCC" };
-			const int lenRecord = 14; // Strings, commas.
+            MixedTestFile = Path.Combine(CsvTestDataDirectory, "mixed.csv");
+        }
 
-            Stream stream = null;
-			try
-			{
-				//	Create the temp file (or overwrite if already there).
-				stream = File.Open( filename, FileMode.OpenOrCreate, FileAccess.ReadWrite );
-				stream.SetLength( 0 );
-				stream.Close();
+        //  ---------------------------------------------------------------------
+        //  Test CSV Reader
+        //  ---------------------------------------------------------------------
 
-				//	Check it's empty.
-				FileInfo info = new FileInfo( filename );
-				Assert.AreEqual( 0, info.Length, "File length not zero." );
-				
-				//  Open for append
-				stream = File.OpenWrite( filename );
-				
-				//	Append a record.
-				CsvWriter writer = new CsvWriter( stream );
-				writer.WriteRecord( record );
-				stream.Flush();
-				stream.Close();
+        [Test]
+        public void TestCsvWriter()
+        {
+            string filename = MixedTestFile;
+            FileStream inStream = null;
+            FileStream outStream = null;
+            try
+            {
+                Console.WriteLine("Loading " + filename);
+                inStream = File.OpenRead(filename);
+                CsvReader reader = new CsvReader(inStream);
+                string[][] records = reader.ReadAll();
 
-				//	Check it's not empty.
-				info = new FileInfo( filename );
-				Assert.AreEqual( lenRecord, info.Length, "File length not increased." );
-			}
+                string outName = Path.Combine(CsvOutputDirectory, "test-writer.csv");
+                outStream = File.OpenWrite(outName);
+                outStream.SetLength(0L);
+
+                CsvWriter writer = new CsvWriter(outStream);
+                //writer.QuoteLimit = -1;
+
+                writer.WriteAll(records);
+                outStream.Flush();
+            }
             catch (Exception ex)
             {
                 Assert.Fail(ex.Message);
             }
             finally
-			{
-				if( stream != null )
-				{
-					stream.Close();
-					//File.Delete( filename );  // Keep it for debugging.
-				}
-			}
-		}
+            {
+                if (inStream != null)
+                {
+                    inStream.Close();
+                }
+
+                if (outStream != null)
+                {
+                    outStream.Close();
+                }
+            }
+        }
 
         [Test]
-        public void TestWriteAlternateSeparator()
+        public void TestWriteRecord()
         {
-            string filename = CsvOutputDirectory + "test-write-alternate-separator.csv";
-            string[] record = new string[] { "AA,AA original separator", "BB|BB new separator", "CCCC" };
+            string filename = Path.Combine(CsvOutputDirectory, "test-write-record.csv");
+            string[] record = new string[] { "AAAA", "BBBB", "CCCC" };
             const int lenRecord = 14; // Strings, commas.
 
             Stream stream = null;
             try
             {
-                Console.WriteLine( "Creating empty " + filename );
                 //	Create the temp file (or overwrite if already there).
-                stream = File.Open( filename, FileMode.OpenOrCreate, FileAccess.ReadWrite );
-                stream.SetLength( 0 );
+                stream = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                stream.SetLength(0);
                 stream.Close();
 
                 //	Check it's empty.
-                FileInfo info = new FileInfo( filename );
-                Assert.AreEqual( 0, info.Length, "File length not zero." );
+                FileInfo info = new FileInfo(filename);
+                Assert.AreEqual(0, info.Length, "File length not zero.");
 
                 //  Open for append
-                Console.WriteLine( "Writing " + filename );
-                stream = File.OpenWrite( filename );
+                stream = File.OpenWrite(filename);
 
                 //	Append a record.
-                CsvWriter writer = new CsvWriter( stream );
-                writer.Separator = '|';
-                writer.WriteRecord( record );
+                CsvWriter writer = new CsvWriter(stream);
+                writer.WriteRecord(record);
                 stream.Flush();
                 stream.Close();
 
-                Console.WriteLine( "Loading " + filename );
-                stream = File.OpenRead( filename );
-                CsvReader reader = new CsvReader( stream );
-                reader.Separator = '|';
-                string[][] records = reader.ReadAll();
-
-                Assert.AreEqual( 1, records.Length, "Should only be one record." );
-
-                Console.WriteLine( "REad :" + ToString( records[ 0 ] ) );
-
-                Assert.AreEqual( record.Length, records[0].Length, "Should be " + record.Length + " fields in record." );
-
-                for( int fieldNo = 0; fieldNo < record.Length; fieldNo++ )
-                {
-                    Assert.AreEqual( record[ fieldNo ], records[ 0 ][ fieldNo ], "Field " + record.Length + " Should be " + record[ fieldNo ] );
-                }
+                //	Check it's not empty.
+                info = new FileInfo(filename);
+                Assert.AreEqual(lenRecord, info.Length, "File length not increased.");
             }
-            catch( Exception ex )
+            catch (Exception ex)
             {
-                Assert.Fail( ex.Message );
+                Assert.Fail(ex.Message);
             }
             finally
             {
-                if( stream != null )
+                if (stream != null)
                 {
                     stream.Close();
                     //File.Delete( filename );  // Keep it for debugging.
+                }
+            }
+        }
+
+        [Test]
+        public void TestWriteAlternateSeparator()
+        {
+            string filename = Path.Combine(CsvOutputDirectory, "test-write-alternate-separator.csv");
+            string[] record = new string[] { "AA,AA original separator", "BB|BB new separator", "CCCC" };
+
+            Stream stream = null;
+            try
+            {
+                Console.WriteLine("Creating empty " + filename);
+                //	Create the temp file (or overwrite if already there).
+                stream = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                stream.SetLength(0);
+                stream.Close();
+
+                //	Check it's empty.
+                FileInfo info = new FileInfo(filename);
+                Assert.AreEqual(0, info.Length, "File length not zero.");
+
+                //  Open for append
+                Console.WriteLine("Writing " + filename);
+                stream = File.OpenWrite(filename);
+
+                //	Append a record.
+                CsvWriter writer = new CsvWriter(stream);
+                writer.Separator = '|';
+                writer.WriteRecord(record);
+                stream.Flush();
+                stream.Close();
+
+                Console.WriteLine("Loading " + filename);
+                stream = File.OpenRead(filename);
+                CsvReader reader = new CsvReader(stream);
+                reader.Separator = '|';
+                string[][] records = reader.ReadAll();
+
+                Assert.AreEqual(1, records.Length, "Should only be one record.");
+
+                Console.WriteLine("Read :" + ToString(records[0]));
+
+                Assert.AreEqual(record.Length, records[0].Length, "Should be " + record.Length + " fields in record.");
+
+                for (int fieldNo = 0; fieldNo < record.Length; fieldNo++)
+                {
+                    Assert.AreEqual(record[fieldNo], records[0][fieldNo], "Field " + record.Length + " Should be " + record[fieldNo]);
+                }
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                }
+            }
+        }
+
+        [Test]
+        public void TestWriteAlternateQuote()
+        {
+            string filename = Path.Combine(CsvOutputDirectory, "test-write-alternate-quote.csv");
+            string[][] recordsOut =
+            {
+                new string[] { "aaa", "bb*b", "ccc" },
+                new string[] { "", "new" + Environment.NewLine + "line", "quoted" },
+                new string[] { "with", "\"other\"", "quo\"\"te" }
+            };
+
+            Stream stream = null;
+            try
+            {
+                Console.WriteLine("Creating " + filename);
+                //	Create the temp file (or overwrite if already there).
+                stream = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                stream.SetLength(0);
+
+                //	Append the data.
+                CsvWriter writer = new CsvWriter(stream);
+                writer.Quote = '*';
+                writer.QuoteLimit = -1;
+                writer.WriteAll(recordsOut);
+                stream.Flush();
+                stream.Close();
+
+                Console.WriteLine("Loading " + filename);
+                stream = File.OpenRead(filename);
+                CsvReader reader = new CsvReader(stream);
+                reader.Quote = '*';
+                string[][] recordsIn = reader.ReadAll();
+
+                int line = 0;
+                foreach (string[] record in recordsIn)
+                {
+                    Console.WriteLine(++line + ":" + ToString(record));
+                }
+
+                Assert.IsTrue(recordsIn.Length == 3, "Wrong number of records in " + filename);
+
+                int index = 0;
+                Assert.IsTrue(recordsIn[index].Length == 3, "Wrong number of items on record " + (index + 1));
+                Assert.IsTrue(CompareStringArray(recordsOut[index], recordsIn[index]), "contents of record " + (index + 1));
+
+                index++;
+                Assert.IsTrue(recordsIn[index].Length == 3, "Wrong number of items on record " + (index + 1));
+                Assert.IsTrue(CompareStringArray(recordsOut[index], recordsIn[index]), "contents of record " + (index + 1));
+
+                index++;
+                Assert.IsTrue(recordsIn[index].Length == 3, "Wrong number of items on record " + (index + 1));
+                Assert.IsTrue(CompareStringArray(recordsOut[index], recordsIn[index]), "contents of record " + (index + 1));
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
                 }
             }
         }

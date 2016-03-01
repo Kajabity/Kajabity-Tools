@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,13 @@ namespace HexViewer
 			// The InitializeComponent() call is required for Windows Forms designer support.
 			//
 			InitializeComponent();
-			
-			//
-			// TODO: Add constructor code after the InitializeComponent() call.
-			//
-		}
 
-		public override void DocumentChanged()
+            //
+            // TODO: Add constructor code after the InitializeComponent() call.
+            //
+        }
+
+        public override void DocumentChanged()
 		{
 			panel.BinaryDocument = (BinaryDocument) manager.Document;
 

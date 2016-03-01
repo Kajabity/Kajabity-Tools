@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,19 +30,37 @@ namespace Kajabity.Tools.Forms
     /// </summary>
     public class SDIForm : Form
     {
+        /// <summary>
+        /// A reference to an instance of the DocumentManager used to load and save
+        /// documents for the application.
+        /// </summary>
         protected DocumentManager manager;
 
+
+        /// <summary>
+        /// If true, when saving a document any existing file with the same name 
+        /// will be renamed with a trailing '~' character as a backup.  Any 
+        /// previous backup (i.e. with the same backup filename) will be deleted.
+        /// </summary>
         protected bool backup = false;
 
         //  ---------------------------------------------------------------------
         //  Constructors.
         //  ---------------------------------------------------------------------
 
+        /// <summary>
+        /// Default constructor - required to enable the Visual Editor for Forms
+        /// in Visual Studio to work.
+        /// </summary>
         public SDIForm()
         {
             this.Load += new EventHandler( SDIForm_Load );
         }
 
+        /// <summary>
+        /// Construct an SDIForm providing an instance of a document manager.
+        /// </summary>
+        /// <param name="manager">the DocumentManager to be used by this form.</param>
         public SDIForm( DocumentManager manager )
         {
             this.manager = manager;
@@ -55,9 +73,18 @@ namespace Kajabity.Tools.Forms
 
         private void SDIForm_Load( object sender, System.EventArgs e )
         {
+            newDocument();
             DocumentChanged();
         }
 
+        /// <summary>
+        /// A handler for the File->New command.  
+        /// Closes any currently open document (prompting the user to save it if modified).
+        /// Creates a new instance of the managed document type.
+        /// Call this method your form's 'OnClick()' handler.
+        /// </summary>
+        /// <param name="sender">the object that sent the event - e.g. menu item or tool bar button.</param>
+        /// <param name="e">Any additional arguments to the event.</param>
         public void FileNewClick( object sender, System.EventArgs e )
         {
             if( canCloseDocument( sender, e ) )
@@ -66,6 +93,14 @@ namespace Kajabity.Tools.Forms
             }
         }
 
+        /// <summary>
+        /// A handler for the File->Open command.   
+        /// Uses the OpenFileDialog to select and open a file.
+        /// Closes any currently open document (prompting the user to save it if modified).
+        /// Call this method your form's 'OnClick()' handler.
+        /// </summary>
+        /// <param name="sender">the object that sent the event - e.g. menu item or tool bar button.</param>
+        /// <param name="e">Any additional arguments to the event.</param>
         public void FileOpenClick( object sender, System.EventArgs e )
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -89,6 +124,13 @@ namespace Kajabity.Tools.Forms
             }
         }
 
+        /// <summary>
+        /// A handler for the File->Close command.  
+        /// Closes any currently open document (prompting the user to save it if modified).
+        /// Call this method your form's 'OnClick()' handler.
+        /// </summary>
+        /// <param name="sender">the object that sent the event - e.g. menu item or tool bar button.</param>
+        /// <param name="e">Any additional arguments to the event.</param>
         public void FileCloseClick( object sender, EventArgs e )
         {
             if( canCloseDocument( sender, e ) )
@@ -97,6 +139,13 @@ namespace Kajabity.Tools.Forms
             }
         }
 
+        /// <summary>
+        /// A handler for the File->Save command.  
+        /// Saves the currently open document - prompting for a filename if it is a new document.
+        /// Call this method your form's 'OnClick()' handler.
+        /// </summary>
+        /// <param name="sender">the object that sent the event - e.g. menu item or tool bar button.</param>
+        /// <param name="e">Any additional arguments to the event.</param>
         public void FileSaveClick( object sender, EventArgs e )
         {
             if( manager.NewFile )
@@ -109,6 +158,13 @@ namespace Kajabity.Tools.Forms
             }
         }
 
+        /// <summary>
+        /// A handler for the File->Save As command.  
+        /// Prompts the user for a filename and path and saves the document to it.
+        /// Call this method your form's 'OnClick()' handler.
+        /// </summary>
+        /// <param name="sender">the object that sent the event - e.g. menu item or tool bar button.</param>
+        /// <param name="e">Any additional arguments to the event.</param>
         public void FileSaveAsClick( object sender, EventArgs e )
         {
             SaveFileDialog dialog = new SaveFileDialog();
@@ -126,6 +182,13 @@ namespace Kajabity.Tools.Forms
             }
         }
 
+        /// <summary>
+        /// A handler for the File->Exit command.  
+        /// Exits the application, closing any currently open document (prompting the user to save it if modified).
+        /// Call this method your form's 'OnClick()' handler.
+        /// </summary>
+        /// <param name="sender">the object that sent the event - e.g. menu item or tool bar button.</param>
+        /// <param name="e">Any additional arguments to the event.</param>
         public void FileExitClick( object sender, EventArgs e )
         {
             if( canCloseDocument( sender, e ) )
@@ -134,12 +197,19 @@ namespace Kajabity.Tools.Forms
             }
         }
 
+        /// <summary>
+        /// Called whenever a document is created or loaded (or closed).
+        /// Override to provide specific Forms handling when the document is changed.
+        /// </summary>
         public virtual void DocumentChanged()
         {
             //	Force a display update.
             this.Refresh();
         }
 
+        /// <summary>
+        /// Helper to create a new document - triggers DocumentChanged().
+        /// </summary>
         private void newDocument()
         {
             manager.NewDocument();
@@ -148,6 +218,9 @@ namespace Kajabity.Tools.Forms
             DocumentChanged();
         }
 
+        /// <summary>
+        /// Helper to load a document - triggers DocumentChanged().  
+        /// </summary>
         protected void loadDocument( string filename )
         {
             try
@@ -174,6 +247,10 @@ namespace Kajabity.Tools.Forms
             }
         }
 
+        /// <summary>
+        /// Helper to save a document - triggers DocumentChanged().
+        /// </summary>
+        /// <param name="filename">the filename and path to save the document into</param>
         private void saveDocument( string filename )
         {
             if( backup && File.Exists( filename ) )
@@ -194,6 +271,9 @@ namespace Kajabity.Tools.Forms
             DocumentChanged();
         }
 
+        /// <summary>
+        /// Helper to close any currently open document - triggers DocumentChanged().
+        /// </summary>
         private void closeDocument()
         {
             manager.Close();
@@ -204,10 +284,11 @@ namespace Kajabity.Tools.Forms
 
         /// <summary>
         /// A "helper" menu action to try to close the currently loaded file if there is one.
+        /// The method will display a prompt to the user to save the file if modified.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <returns></returns>
+        /// <param name="sender">the object that sent the event - e.g. menu item or tool bar button.</param>
+        /// <param name="e">Any additional arguments to the event.</param>
+        /// <returns>returns true if the document is closed.</returns>
         protected bool canCloseDocument( object sender, System.EventArgs e )
         {
             if( manager.Modified )

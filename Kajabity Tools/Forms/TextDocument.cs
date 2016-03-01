@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,14 @@ namespace Kajabity.Tools.Forms
     /// </summary>
     public class TextDocument : Document
     {
-        private string text;
+        /// <summary>
+        /// A variable to hold the document's text - initialised to an empty string.
+        /// </summary>
+        private string text = String.Empty;
+
+        /// <summary>
+        /// The document's text as a string. Initialised to an empty string.
+        /// </summary>
         public string Text
         {
             get
@@ -45,12 +52,19 @@ namespace Kajabity.Tools.Forms
         //  Constructors.
         //  ---------------------------------------------------------------------
 
+        /// <summary>
+        /// Construct an empty TextDocument.
+        /// </summary>
         public TextDocument()
         {
         }
 
-        public TextDocument( string name )
-            : base( name )
+        /// <summary>
+        /// Construct an emtpy TextDocument specifying the filename.
+        /// </summary>
+        /// <param name="filename">the filename of the text document.</param>
+        public TextDocument( string filename )
+            : base( filename )
         {
         }
 

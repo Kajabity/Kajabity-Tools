@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-15 Williams Technologies Limtied.
+ * Copyright 2009-15 Williams Technologies Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace Kajabity.Tools.Csv
         //  ---------------------------------------------------------------------
         //  Settings
         //  ---------------------------------------------------------------------
-        
+
         /// <summary>
         /// An explicit newline string matching the standard.
         /// </summary>
@@ -45,13 +45,17 @@ namespace Kajabity.Tools.Csv
         /// Any string containing the following characters needs to be quoted and
         /// any quote characters doubled up.
         /// </summary>
-        private char[] escapeChars = new char[] { ',', '"', '\n', '\r' };
+        private char[] escapeChars = new char[] { CsvConstants.DEFAULT_SEPARATOR_CHAR, CsvConstants.DEFAULT_QUOTE_CHAR, '\n', '\r' };
+
+        /// <summary>
+        /// The separator between fields in a single CSV record (line).
+        /// </summary>
+        private char separator = CsvConstants.DEFAULT_SEPARATOR_CHAR;
 
         /// <summary>
         /// Gets or sets the separator character used in the file - default
         /// value is a comma (",").
         /// </summary>
-        private char separator = ',';
         public char Separator
         {
             get
@@ -63,7 +67,31 @@ namespace Kajabity.Tools.Csv
                 separator = value;
 
                 // Now update escapeChars so the changed separator will be escaped.
-                escapeChars[ 0 ] = separator;
+                escapeChars[0] = separator;
+            }
+        }
+
+        /// <summary>
+        /// The character used to quote a single field in a CSV record (line).
+        /// </summary>
+        private char quote = CsvConstants.DEFAULT_QUOTE_CHAR;
+
+        /// <summary>
+        /// Gets or sets the quote character used in the file - default
+        /// value is a double quote ('"').
+        /// </summary>
+        public char Quote
+        {
+            get
+            {
+                return quote;
+            }
+            set
+            {
+                quote = value;
+
+                // Now update escapeChars so the changed separator will be escaped.
+                escapeChars[1] = quote;
             }
         }
 
@@ -102,7 +130,7 @@ namespace Kajabity.Tools.Csv
         /// caller doesn't cut it.
         /// </summary>
         private int flush = 0;
-        
+
         //  ---------------------------------------------------------------------
         //  Constructors.
         //  ---------------------------------------------------------------------
@@ -111,10 +139,10 @@ namespace Kajabity.Tools.Csv
         /// Construct a new to output CSV data to the stream provided.
         /// </summary>
         /// <param name="stream">CSV data will be written to this stream.</param>
-        public CsvWriter( Stream stream )
+        public CsvWriter(Stream stream)
         {
             // Write the date in the US-ASCII format (code page 20127)
-            writer = new StreamWriter( stream, System.Text.Encoding.GetEncoding( 20127 ) );
+            writer = new StreamWriter(stream, System.Text.Encoding.GetEncoding(20127));
         }
 
         //  ---------------------------------------------------------------------
@@ -127,18 +155,18 @@ namespace Kajabity.Tools.Csv
         /// <param name="records">an array of string arrays containing the
         /// records to be written.  Each string becomes a single comma separated
         /// field, each array of strings becomes a record.</param>
-        public void WriteAll( string[][] records )
+        public void WriteAll(string[][] records)
         {
             flush++;
-            if( records != null && records.Length > 0 )
+            if (records != null && records.Length > 0)
             {
-                foreach( string[] record in records )
+                foreach (string[] record in records)
                 {
-                    WriteRecord( record );
+                    WriteRecord(record);
                 }
             }
 
-            if( --flush == 0 )
+            if (--flush == 0)
             {
                 writer.Flush();
             }
@@ -149,23 +177,23 @@ namespace Kajabity.Tools.Csv
         /// of the previous line if this is not the first record.
         /// </summary>
         /// <param name="record">The record to be written - an array of string fields.</param>
-        public void WriteRecord( string[] record )
+        public void WriteRecord(string[] record)
         {
             flush++;
-            if( record != null && record.Length > 0 )
+            if (record != null && record.Length > 0)
             {
-                if( recordCount++ > 0 )
+                if (recordCount++ > 0)
                 {
-                    writer.Write( newLine );
+                    writer.Write(newLine);
                     fieldCount = 0;
                 }
 
-                foreach( string field in record )
+                foreach (string field in record)
                 {
-                    WriteField( field );
+                    WriteField(field);
                 }
 
-                if( --flush == 0 )
+                if (--flush == 0)
                 {
                     writer.Flush();
                 }
@@ -177,18 +205,18 @@ namespace Kajabity.Tools.Csv
         /// it is not the first field on the line.
         /// </summary>
         /// <param name="field"></param>
-        public void WriteField( string field )
+        public void WriteField(string field)
         {
             flush++;
-            if( fieldCount++ > 0 )
+            if (fieldCount++ > 0)
             {
-                writer.Write( separator );
+                writer.Write(separator);
             }
 
-            WriteFieldEscaped( field );
-            
+            WriteFieldEscaped(field);
 
-            if( --flush == 0 )
+
+            if (--flush == 0)
             {
                 writer.Flush();
             }
@@ -204,29 +232,36 @@ namespace Kajabity.Tools.Csv
         /// is written (not even quoted).
         /// </summary>
         /// <param name="field">a field to be written</param>
-        private void WriteFieldEscaped( string field )
+        private void WriteFieldEscaped(string field)
         {
-            if( string.IsNullOrEmpty(field) )
+            if (string.IsNullOrEmpty(field))
             {
+                if (QuoteLimit < 0)
+                {
+                    writer.Write(quote);
+                    writer.Write(quote);
+                }
+
                 return;
             }
 
-            if( field.Length > QuoteLimit || field.IndexOfAny( escapeChars ) >= 0 )
+            if (field.Length > QuoteLimit || field.IndexOfAny(escapeChars) >= 0)
             {
-                writer.Write( '"' );
-                foreach( char ch in field )
+                writer.Write(quote);
+                foreach (char ch in field)
                 {
-                    writer.Write( ch );
-                    if( ch == '"' )
+                    writer.Write(ch);
+                    if (ch == quote)
                     {
-                        writer.Write( '"' );
+                        writer.Write(quote);
                     }
                 }
-                writer.Write( '"' );
+
+                writer.Write(quote);
             }
             else
             {
-                writer.Write( field );
+                writer.Write(field);
             }
         }
     }
