@@ -26,6 +26,7 @@ nuget:
     account_feed: true
     project_feed: true
     disable_publish_on_pr: true     # disable publishing of .nupkg artifacts to
+                                    # account/project feeds for pull request builds
 
 #---------------------------------# 
 #       build configuration       # 
@@ -46,8 +47,8 @@ build:
     publish_nuget_symbols: true     # generate and publish NuGet symbol packages 
     include_nuget_references: true  # add -IncludeReferencedProjects option while packaging NuGet artifacts 
  
-# MSBuild verbosity level 
-    verbosity: normal
+# MSBuild verbosity level - one of quiet|minimal|normal|detailed
+    verbosity: detailed
 
 #---------------------------------# 
 #      artifacts configuration    # 
