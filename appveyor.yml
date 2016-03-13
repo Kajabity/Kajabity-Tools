@@ -21,6 +21,12 @@ skip_tags: true
 init:
     - cmd: git config --global core.autocrlf true
 
+# Automatically register private account and/or project AppVeyor NuGet feeds.
+nuget:
+    account_feed: true
+    project_feed: true
+    disable_publish_on_pr: true     # disable publishing of .nupkg artifacts to
+
 #---------------------------------# 
 #       build configuration       # 
 #---------------------------------# 
