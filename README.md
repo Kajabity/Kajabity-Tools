@@ -1,9 +1,17 @@
-Kajabity-Tools
-==============
+Kajabity-Tools GitHub Repository
+================================
 
-A collection of miscellaneous code utilities and snippets.  Initially, there are only some C# (or .NET) utilities, but I will 
-more collections in the future for other platforms - e.g. Java, JavaScript and Windows Store Apps.
+Kajabity Tools is a growing collection of code utility classes which I have refactored 
+from applications I have written.  
 
-These pieces of code are intended to be built as a library or cut and pasted wherever needed.
+This repository contains several sub-projects:
+
+-	**Kajabity Tools** - a DLL project providing a collection of utilities for .NET projects.
+-	**Kajabity Tools.Test** - NUnit tests for the Kajabity Tools utilities.
+-	**Samples** - a collection of sample Desktop application projects illustrating the use of some of Kajabity Tools utility classes.
+
+See the Releases section on GitHub to download copies of code, DLL exe's and NuGets.
+
+Kajabity Tools DLL is a strongly named assembly and is available from nuget.org as Kajabity.Tools.
 
 For much more details go to [http://www.kajabity.com/content/kajabity-tools/](http://www.kajabity.com/content/kajabity-tools/).
