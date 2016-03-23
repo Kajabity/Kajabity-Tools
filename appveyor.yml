@@ -3,7 +3,7 @@
 #---------------------------------# 
  
 # version format 
-version: 0.3-{branch}-{build}
+version: 0.4-{branch}-{build}
 
 # branches to build
 #branches
@@ -48,7 +48,7 @@ build:
     include_nuget_references: true  # add -IncludeReferencedProjects option while packaging NuGet artifacts 
  
 # MSBuild verbosity level - one of quiet|minimal|normal|detailed
-    verbosity: detailed
+    verbosity: normal
 
 #---------------------------------# 
 #      artifacts configuration    # 

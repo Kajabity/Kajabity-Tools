@@ -13,4 +13,4 @@ Kajabity Tools is available in several different forms:
 
 See the Releases section on GitHub to download copies of code, DLL exe's and NuGets.
 
-For much more details go to [http://www.kajabity.com/content/kajabity-tools/](http://www.kajabity.com/content/kajabity-tools/).
+Full documentation is available at [http://www.kajabity.com/kajabity-tools/](http://www.kajabity.com/kajabity-tools/).

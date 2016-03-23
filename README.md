@@ -14,4 +14,6 @@ See the Releases section on GitHub to download copies of code, DLL exe's and NuG
 
 Kajabity Tools DLL is a strongly named assembly and is available from nuget.org as Kajabity.Tools.
 
-For much more details go to [http://www.kajabity.com/content/kajabity-tools/](http://www.kajabity.com/content/kajabity-tools/).
+Full documentation is available at [http://www.kajabity.com/kajabity-tools/](http://www.kajabity.com/kajabity-tools/).
+
+Version 0.3 documentation is still available at [http://www.kajabity.com/content/kajabity-tools/](http://www.kajabity.com/content/kajabity-tools/).
