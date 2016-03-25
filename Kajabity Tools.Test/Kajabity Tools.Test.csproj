@@ -112,6 +112,12 @@
     <None Include="Test Data\Csv\unix-line-ends.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Test Data\Java\non-ascii-symbols-native2ascii.properties">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Test Data\Java\non-ascii-symbols-utf8.properties">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Test Data\Java\comments.properties">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

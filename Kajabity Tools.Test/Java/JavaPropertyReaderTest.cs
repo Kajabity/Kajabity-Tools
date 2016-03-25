@@ -23,6 +23,7 @@ using System.IO;
 using Kajabity.Tools.Test;
 using NUnit.Framework;
 using System.Reflection;
+using System.Text;
 
 namespace Kajabity.Tools.Java
 {
@@ -37,6 +38,8 @@ namespace Kajabity.Tools.Java
         private string MixedTestFile;
         private string SeparatorsTestFile;
         private string SpecialCharactersTestFile;
+        private string NonAciiSymbolsUtf8TestFile;
+        private string NonAsciiSymbolsNativeToAsciiTestFile;
 
         /// <summary>
         /// The directory where a copy of the Java test data input files are placed.
@@ -73,6 +76,8 @@ namespace Kajabity.Tools.Java
             MixedTestFile = Path.Combine(JavaTestDataDirectory, "mixed.properties");
             SeparatorsTestFile = Path.Combine(JavaTestDataDirectory, "separators.properties");
             SpecialCharactersTestFile = Path.Combine(JavaTestDataDirectory, "special-characters.properties");
+            NonAciiSymbolsUtf8TestFile = Path.Combine(JavaTestDataDirectory, "non-ascii-symbols-utf8.properties");
+            NonAsciiSymbolsNativeToAsciiTestFile = Path.Combine(JavaTestDataDirectory, "non-ascii-symbols-native2ascii.properties");
         }
 
         [Test]
@@ -271,6 +276,79 @@ namespace Kajabity.Tools.Java
                 if (fileStream != null)
                 {
                     fileStream.Close();
+                }
+            }
+        }
+
+        [Test]
+        public void TestUtf8NonAsciiSymbols()
+        {
+            FileStream utf8FileStream = null;
+            FileStream isoFileStream = null;
+            try
+            {
+                Console.WriteLine("Loading " + NonAciiSymbolsUtf8TestFile);
+
+                // A file containing non-ASCII characters, which is saved using the utf8 encoding
+                utf8FileStream = new FileStream(NonAciiSymbolsUtf8TestFile, FileMode.Open);
+
+                Console.WriteLine("Loading " + NonAsciiSymbolsNativeToAsciiTestFile);
+
+                // A file with the same data as above, but processed with the native2ascii tool from jdk 1.8, and stored in ISO-8859-1. This will work correctly.
+                isoFileStream = new FileStream(NonAsciiSymbolsNativeToAsciiTestFile, FileMode.Open);
+
+                // Java properties read from the utf8 file with correct encoding provided
+                JavaProperties utf8PropertiesCorrect = new JavaProperties();
+
+                // we explicitly specify the encoding, so that UTF8 characters are read using the UTF8 encoding and the data will be correct
+                utf8PropertiesCorrect.Load(utf8FileStream, Encoding.UTF8);
+
+                JavaProperties utf8PropertiesIncorrect = new JavaProperties();
+                utf8FileStream.Seek(0, SeekOrigin.Begin);// reset the stream position from the previous loading.
+                // we do not set the encoding, so the data will not appear correctly - UTF8 characters will be read usign the default ISO-8859-1 encoding
+                // this is to ensure that setting the encoding makes a difference
+                utf8PropertiesIncorrect.Load(utf8FileStream);
+
+                
+                JavaProperties isoProperties = new JavaProperties();
+                isoProperties.Load(isoFileStream);
+
+                foreach (var key in utf8PropertiesCorrect.Keys)
+                {
+                    // Asert the correct file is identical to its native2ascii version
+                    Assert.AreEqual(utf8PropertiesCorrect[key], isoProperties[key]);
+
+                    if (key.Equals("AsciiText"))
+                    {
+                        // Assert that not-using the proper encoding will not corrupt pure ASCII data
+                        Assert.AreEqual(utf8PropertiesCorrect[key], utf8PropertiesIncorrect[key]);
+                        Assert.AreEqual(utf8PropertiesCorrect[key], isoProperties[key]);
+                    }
+                    else
+                    {
+                        // Assert that not-using the proper encoding will corrupt data
+                        Assert.AreNotEqual(utf8PropertiesIncorrect[key], utf8PropertiesCorrect[key]);
+                        Assert.AreNotEqual(utf8PropertiesIncorrect[key], isoProperties[key]);
+                    }
+                    
+                }
+                isoFileStream.Close();
+
+                //Assert.IsEmpty(properties);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
+            }
+            finally
+            {
+                if (utf8FileStream != null)
+                {
+                    utf8FileStream.Close();
+                }
+                if (isoFileStream != null)
+                {
+                    isoFileStream.Close();
                 }
             }
         }
