@@ -2,12 +2,12 @@
 .settings/
 .classpath
 .project
+
+## Ignore Maven directories.
 target/
 website/
-*.url
-*.DotSettings
-.vs/
 
+*.url
 
 ## Ignore subversion directories.
 .svn/
@@ -19,6 +19,8 @@ website/
 *.suo
 *.user
 *.sln.docstates
+*.DotSettings
+.vs/
 
 # Build results
 [Dd]ebug/
