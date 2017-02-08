@@ -167,7 +167,7 @@ namespace Kajabity.Tools.Csv
         /// <summary>
         /// The input stream that characters are read and parsed from.
         /// </summary>
-        private BufferedStream inStream = null;
+        private TextReader inStream = null;
 
         /// <summary>
         /// Stores the next character after it's been peeked until it is removed by NextChar().
@@ -194,7 +194,17 @@ namespace Kajabity.Tools.Csv
         /// <param name="stream">The input stream to read from.</param>
         public CsvReader(Stream stream)
         {
-            inStream = new BufferedStream(stream, BufferSize);
+            inStream = new StreamReader(stream);
+        }
+
+        /// <summary>
+        /// Construct a CsvReader with a TextReader (e.g. StreamReader) allowing the caller
+        /// to set the encoding, buffer size, etc.
+        /// </summary>
+        /// <param name="reader">an instance of a TextReader where the CSV data will be loaded from.</param>
+        public CsvReader( TextReader reader )
+        {
+            inStream = reader;
         }
 
         //  ---------------------------------------------------------------------
@@ -426,7 +436,7 @@ namespace Kajabity.Tools.Csv
                 return savedChar;
             }
 
-            return inStream.ReadByte();
+            return inStream.Read();
         }
 
         /// <summary>
@@ -442,7 +452,7 @@ namespace Kajabity.Tools.Csv
             }
 
             saved = true;
-            return savedChar = inStream.ReadByte();
+            return savedChar = inStream.Read();
         }
     }
 }
